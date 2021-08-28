@@ -24,7 +24,7 @@ activate virtual environment and start python-console:
  
 ```console
 foo@bar:~/simplerss$ source env/bin/activate
-foo@bar:~/simplerss$ python
+(env) foo@bar:~/simplerss$ python
 ```
 
 in python-console create root-window and start program.
@@ -39,7 +39,7 @@ Exit program by closing its window and in python-console press
 ctrl-d to exit. Deactivate virtual environment with:
 
 ```console
-foo@bar:~/simplerss$ deactivate
+(env) foo@bar:~/simplerss$ deactivate
 ```
 
 # Uninstalling

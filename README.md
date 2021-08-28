@@ -49,3 +49,6 @@ Remove git and tkinter:
 ```console
 foo@bar:~$ apt remove python3-tk git
 ```
+
+# Licence
+This project is licensed under the terms of the GNU General Public License v3.0.

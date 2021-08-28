@@ -14,32 +14,32 @@ clone repository with git:
 ```console
 foo@bar:~$ mkdir simplerss
 foo@bar:~$ cd simplerss
-foo@bar:~$ git clone https://github.com/SamuelKos/simple-rss .
-foo@bar:~$ chmod u+x mkvenv
-foo@bar:~$ ./mkvenv env
+foo@bar:~/simplerss$ git clone https://github.com/SamuelKos/simple-rss .
+foo@bar:~/simplerss$ chmod u+x mkvenv
+foo@bar:~/simplerss$ ./mkvenv env
 ```
 
 # Running
 activate virtual environment and start python-console:
  
 ```console
-foo@bar:~$ source env/bin/activate
-foo@bar:~$ python
+foo@bar:~/simplerss$ source env/bin/activate
+foo@bar:~/simplerss$ python
 ```
 
 in python-console create root-window and start program.
 
 ```python
-from tkinter import Tk
-root=Tk().withdraw()
-u=simple_rss.Browser(root)
+>>> from tkinter import Tk
+>>> root=Tk().withdraw()
+>>> u=simple_rss.Browser(root)
 ```
 
 Exit program by closing its window and in python-console press
 ctrl-d to exit. Deactivate virtual environment with:
 
 ```console
-foo@bar:~$ deactivate
+foo@bar:~/simplerss$ deactivate
 ```
 
 # Uninstalling

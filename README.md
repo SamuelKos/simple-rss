@@ -30,6 +30,7 @@ foo@bar:~/simplerss$ source env/bin/activate
 in python-console create root-window and start program.
 
 ```python
+>>> import simple_rss
 >>> from tkinter import Tk
 >>> root=Tk().withdraw()
 >>> u=simple_rss.Browser(root)

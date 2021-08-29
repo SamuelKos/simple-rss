@@ -528,7 +528,7 @@ class Browser(Toplevel):
 					self.text1.see(pos)
 					
 		except URLError as err:
-			s  = 'Something went wrong:\n\n%s\n\nVirhekoodi:\n\n%s' % (link, err.reason)
+			s  = 'Something went wrong:\n\n%s\n\nErrorcode:\n\n%s' % (link, err.reason)
 			self.text1.insert(END, s)
 		
 		

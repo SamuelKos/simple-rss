@@ -1,11 +1,11 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Create a new virtual environment for python.
 # Usage: mkvenv [name_of_myvenv]
 # If no argument is given this  defaults to creating virtual environment
 # named "venv"
 
 if [[ "$#" -gt 1 ]]; then
- echo "Illegal number of parameters"
+ echo "mkvenv: Illegal number of parameters"
  exit 1
 elif [[ "$#" -eq 0 ]]; then
  newdir="venv"
@@ -14,7 +14,7 @@ else
 fi
 
 if [[ -e ${newdir} ]]; then
- echo "File ${newdir} already exist"
+ echo "mkvenv: directory ${newdir} already exist"
  exit 1
 fi
 
@@ -26,14 +26,21 @@ python3 -m venv ${newdir} && \
 pip install -U pip && \
 pip install -U setuptools && \
 pip install wheel  && \
+
 echo "" && \
-echo "venv installed succesfully" && \
+echo "******************************" && \
+echo "* venv installed succesfully *" && \
+echo "******************************" && \
 echo "" && \
 
 # Second: install normal requirements
 if [[ -e requirements.txt ]]; then
  pip install -r requirements.txt && \
+
  echo "" && \
- echo "requirements installed succesfully"
+ echo "**************************************" && \
+ echo "* requirements installed succesfully *"
+ echo "**************************************" && \
+ echo ""
 
 fi

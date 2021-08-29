@@ -29,22 +29,11 @@ who was involved in RSS-format developing and more. Check it out!
 # Running 
 
 ```console
-foo@bar:~/simple-rss$ ./reader.sh
+foo@bar:~/simple-rss$ source env/bin/activate
+foo@bar:~/simple-rss$ python -i startup.py
 ```
 
 Exit python-console with ctrl-d.
-You can make starting program easier by copying it to your bin-directory. If you don't
-have a bin-directory in your home directory, create it first.
- 
-```console
-foo@bar:~/simple-rss$ cp reader.sh ~/bin/reader           
-```
-
-Now you can just:
-
-```console
-foo@bar:~$ reader           
-```
 
 # Uninstalling
 Just remove the folder where program was installed.

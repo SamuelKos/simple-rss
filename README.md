@@ -28,7 +28,8 @@ who was involved in RSS-format developing and more. Check it out!
 foo@bar:~/simple-rss$ ./reader.sh
 ```
 
-You can make this easier by copying it to your bin-directory. If you don't
+Exit python-console with ctrl-d.
+You can make starting program easier by copying it to your bin-directory. If you don't
 have a bin-directory in your home directory, create it first.
  
 ```console
@@ -39,25 +40,6 @@ Now you can just:
 
 ```console
 foo@bar:~$ reader           
-```
-
-# Running with full control
-Activate virtual environment and start python-console:
- 
-```console
-foo@bar:~/simple-rss$ source env/bin/activate
-(env) foo@bar:~/simple-rss$ python
-```
-
-In python-console create root-window, start the program like below, and now you can
-access attributes of the Browser-instance and so on. This is also in startup.py,
-so you can after activating environment skip these with: python -i startup.py.
-
-```python
->>> import simple_rss
->>> from tkinter import Tk
->>> root=Tk().withdraw()
->>> u=simple_rss.Browser(root)
 ```
 
 # Uninstalling

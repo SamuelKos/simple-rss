@@ -4,20 +4,15 @@ Tested to work with Debian Buster and Bullseye.
 
 # Installing
 If you have git, clone this repo and then run install.sh.
-It will create directory named simplerss under the current working directory.
+It will create directory named simple-rss under the current working directory.
  
 ```console
-foo@bar:~$ git clone https://github.com/SamuelKos/simple-rss .
-foo@bar:~$ sudo ./install.sh
+foo@bar:~$ git clone https://github.com/SamuelKos/simple-rss
+foo@bar:~$ cd simple-rss
+foo@bar:~/simple-rss$ sudo ./install.sh
 ```
 
-If you don't have git, then just first manually download install.sh, copy it
-some place nice and run it.
-
-```console
-foo@bar:~$ sudo ./install.sh
-```
-
+If you don't have git, then just install it first with: sudo apt install git.
 Sudo is needed in case we need to install system level dependencies like python3-tk.
 
 # About Python dependencies:
@@ -30,14 +25,14 @@ who was involved in RSS-format developing and more. Check it out!
 # Running 
 
 ```console
-foo@bar:~/simplerss$ ./reader.sh
+foo@bar:~/simple-rss$ ./reader.sh
 ```
 
 You can make this easier by copying it to your bin-directory. If you don't
 have a bin-directory in your home directory, create it first.
  
 ```console
-foo@bar:~/simplerss$ cp ./reader.sh ~/bin/reader           
+foo@bar:~/simple-rss$ cp reader.sh ~/bin/reader           
 ```
 
 Now you can just:
@@ -50,8 +45,8 @@ foo@bar:~$ reader
 Activate virtual environment and start python-console:
  
 ```console
-foo@bar:~/simplerss$ source env/bin/activate
-(env) foo@bar:~/simplerss$ python
+foo@bar:~/simple-rss$ source env/bin/activate
+(env) foo@bar:~/simple-rss$ python
 ```
 
 In python-console create root-window, start the program like below, and now you can

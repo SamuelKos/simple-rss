@@ -4,7 +4,12 @@ Tested to work with Debian Buster and Bullseye.
 
 # Installing
 debian-packages required: python3-tk python3-venv
-Install them with: sudo apt install python3-tk python3-venv
+To install them:
+
+```console
+foo@bar:~$ sudo apt install python3-tk python3-venv
+```
+
 Then clone this repo and run install.sh.
 Git will create directory named simple-rss under the current working directory.
  

@@ -3,17 +3,16 @@ Simple RSS Reader with GUI.
 Tested to work with Debian Buster and Bullseye.
 
 # Installing
-If you have git, clone this repo and then run install.sh.
-It will create directory named simple-rss under the current working directory.
+debian-packages required: python3-tk python3-venv
+Install them with: sudo apt install python3-tk python3-venv
+Then clone this repo and run install.sh.
+Git will create directory named simple-rss under the current working directory.
  
 ```console
 foo@bar:~$ git clone https://github.com/SamuelKos/simple-rss
 foo@bar:~$ cd simple-rss
-foo@bar:~/simple-rss$ sudo ./install.sh
+foo@bar:~/simple-rss$ ./install.sh
 ```
-
-If you don't have git, then just install it first with: sudo apt install git.
-Sudo is needed in case we need to install system level dependencies like python3-tk.
 
 # About Python dependencies:
 Only one library outside standard is used: [html2text](https://github.com/Alir3z4/html2text/)

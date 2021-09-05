@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
-./mkvenv env && echo "Installing done. Run with: ./reader.sh"
+./mkvenv env && echo "Installing done."
 

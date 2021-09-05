@@ -535,3 +535,14 @@ class Browser(Toplevel):
 		self.text1.config(state='disabled')
 		self.text2.config(state='disabled')
 
+
+	def quit_me(self, event=None):
+		self.quit()
+		self.destroy()
+
+
+if __name__ == '__main__':
+	root = Tk().withdraw()
+	b = Browser(root)
+	b.protocol("WM_DELETE_WINDOW", b.quit_me)
+	b.mainloop()

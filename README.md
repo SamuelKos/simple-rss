@@ -10,13 +10,14 @@ To install them:
 foo@bar:~$ sudo apt install python3-tk python3-venv
 ```
 
-Then clone this repo and run install.sh.
+Then clone this repo and run make.
 Git will create directory named simple-rss under the current working directory.
+Install-script will create launcher-script named rss to home/bin-directory.
  
 ```console
 foo@bar:~$ git clone https://github.com/SamuelKos/simple-rss
 foo@bar:~$ cd simple-rss
-foo@bar:~/simple-rss$ ./install.sh
+foo@bar:~/simple-rss$ ./make
 ```
 
 # About Python dependencies:
@@ -29,14 +30,11 @@ who was involved in RSS-format developing and more. Check it out!
 # Running 
 
 ```console
-foo@bar:~/simple-rss$ source env/bin/activate
-foo@bar:~/simple-rss$ python -i startup.py
+foo@bar:~$ rss
 ```
 
-Exit python-console with ctrl-d.
-
 # Uninstalling
-Just remove the folder where program was installed.
+Just remove the simple-rss -folder and rss-script in home/bin.
 To remove git and tkinter:
 
 ```console

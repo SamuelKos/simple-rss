@@ -20,6 +20,6 @@ chmod u+x $execpath
 echo -e "#!/usr/bin/env bash" >> $execpath
 echo -e "cd $gitpath" >> $execpath
 echo -e "source env/bin/activate" >> $execpath
-echo -e "python3 startup.py" >> $execpath
+echo -e "python simple_rss.py" >> $execpath
 
 

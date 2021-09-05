@@ -174,7 +174,7 @@ class Browser(Toplevel):
 
 	'''
 
-	def __init__(self, root, url=None, hdpi=False):
+	def __init__(self, root, url=None, hdpi=True):
 		super().__init__(root, class_='Simple RSS')
 
 		self.user_agent = "simple-rss"

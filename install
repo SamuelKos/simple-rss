@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+gitpath=$(pwd)
+execname="rss"
+
+if [[ -e $HOME/bin ]]; then
+ if [[ -e $HOME/bin/$execname ]]; then
+  echo "install.sh: Could not install, file $HOME/bin/$execname already exist"
+  exit 1
+ fi
+else
+ echo "install.sh: directory $HOME/bin does not exist, creating"
+ mkdir $HOME/bin
+fi
+
+execpath=$HOME/bin/$execname
+touch $execpath
+chmod u+x $execpath
+
+echo -e "#!/usr/bin/env bash" >> $execpath
+echo -e "cd $gitpath" >> $execpath
+echo -e "source env/bin/activate" >> $execpath
+echo -e "python3 startup.py" >> $execpath
+
+

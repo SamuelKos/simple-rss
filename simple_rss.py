@@ -176,7 +176,7 @@ class Browser(Toplevel):
 
 	def __init__(self, root, url=None, hdpi=True):
 		super().__init__(root, class_='Simple RSS')
-
+		self.protocol("WM_DELETE_WINDOW", self.quit_me)
 		self.user_agent = "simple-rss"
 		self.history = []
 		self.input = url
@@ -544,5 +544,4 @@ class Browser(Toplevel):
 if __name__ == '__main__':
 	root = Tk().withdraw()
 	b = Browser(root)
-	b.protocol("WM_DELETE_WINDOW", b.quit_me)
 	b.mainloop()

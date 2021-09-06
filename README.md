@@ -4,7 +4,6 @@ Tested to work with Debian Buster and Bullseye.
 
 # Installing
 debian-packages required: python3-tk python3-venv
-To install them:
 
 ```console
 foo@bar:~$ sudo apt install python3-tk python3-venv

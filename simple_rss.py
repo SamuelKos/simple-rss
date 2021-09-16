@@ -30,7 +30,7 @@ HELPTXT = '''
 		
 	At bottom-pane, when clicked address with mouse-right: copy link
 	
-	When editing soures, leave an empty line after last line and then
+	When editing sources, leave an empty line after last line and then
 	write name for the feed in dropdown-menu and then add the
 	URL-address of the RSS-feed to next line.
 
@@ -274,7 +274,7 @@ class Browser(Toplevel):
 		
 		self.bind("<Return>", lambda a: self.gethtml())
 		self.bind("<Escape>", lambda e: self.iconify())
-		self.bind("<Left>", lambda a: self.back_hist())
+		self.bind("<Left>", lambda event: self.back_hist(event))
 		self.bind("<Button-3>", lambda event: self.raise_popup(event))
 		
 		self.popup_whohasfocus = None
@@ -342,7 +342,7 @@ class Browser(Toplevel):
 		
 		self.bind("<Return>", lambda a: self.gethtml())
 		self.bind("<Escape>", lambda e: self.iconify())
-		self.bind("<Left>", lambda a: self.back_hist())
+		self.bind("<Left>", lambda event: self.back_hist(event))
 		
 		self.btn_open.config(text='Open', command=self.chk)
 		
@@ -401,8 +401,11 @@ class Browser(Toplevel):
 				
 	def stop_help(self, event=None):
 		self.bind("<Escape>", lambda e: self.iconify())
+		self.entry.config(state='normal')
 		self.back_hist(flag_help=True)
-		return 'break'
+		
+		if event != None:
+			return 'break'
 
 	
 	def help(self):
@@ -410,10 +413,15 @@ class Browser(Toplevel):
 		self.text1.insert(INSERT, self.helptxt)
 		self.text1.config(state='disabled')
 		self.text2.config(state='disabled')
+		self.entry.config(state='disabled')
 		self.bind("<Escape>", self.stop_help)
 		
 
-	def back_hist(self, flag_help=False):
+	def back_hist(self, event=None, flag_help=False):
+		if event != None:
+			if 'entry' in str(event.widget).split('.')[-1]:
+				return
+		
 		self.flag_back = True
 		
 		if flag_help and len(self.history) > 0:

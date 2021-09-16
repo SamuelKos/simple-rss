@@ -243,11 +243,15 @@ class Browser(Toplevel):
 		if self.hdpi_screen:
 			self.text1.vbar.config(width=30)
 			self.text2.vbar.config(width=30)
+			self.text1.vbar.config(elementborderwidth=4)
+			self.text2.vbar.config(elementborderwidth=4)
 			self.titletabs=('2c', )
 			self.lmarg2='2c'
 		else:
 			self.text1.vbar.config(width=20)
 			self.text2.vbar.config(width=20)
+			self.text1.vbar.config(elementborderwidth=3)
+			self.text2.vbar.config(elementborderwidth=3)
 			self.titletabs=('1c', )
 			self.lmarg2='1c'
 

@@ -19,7 +19,7 @@ import rssfeed
 # uncomment if you have icon:
 ##ICONPATH = "./icons/rssicon.png"
 
-RSSLINKS = r'./mysources.lst'
+RSSLINKS = r'./sources.lst'
 HELPTXT = '''
 	left: previous view
 	ESC:  usually the obvious action

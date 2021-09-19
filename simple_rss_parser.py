@@ -3,13 +3,13 @@ from re import findall, DOTALL
 from urllib.request import Request, urlopen
 
 class Parser:
-	''' Parser for xml. Parses <title> and <link>.
+	''' Simple parser for xml.
 	'''
 	
 	def __init__(self):
 		self.data = {}
 		self.tags = ['title', 'media:content', 'link', 'description']
-		self.user_agent = 'simple-rss'
+		self.user_agent = 'https://github.com/SamuelKos/simple-rss'
 	
 
 	def parse(self, link):

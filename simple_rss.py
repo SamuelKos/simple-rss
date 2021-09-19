@@ -12,12 +12,11 @@ import rssfeed
 
 # Main-class is Browser and it is last at the bottom 
 
-#TODO: Files that needs to be supplied: ICON, FONT, SOURCES.LST
+#TODO: Files that needs to be supplied: FONT
 
 
 
-# uncomment if you have icon:
-##ICONPATH = "./icons/rssicon.png"
+ICONPATH = r'./rssicon.png'
 
 RSSLINKS = r'./sources.lst'
 HELPTXT = '''
@@ -173,15 +172,14 @@ class Browser(Toplevel):
 	def __init__(self, root, url=None, hdpi=True):
 		super().__init__(root, class_='Simple RSS')
 		self.protocol("WM_DELETE_WINDOW", self.quit_me)
-		self.user_agent = "simple-rss"
+		self.user_agent = "https://github.com/SamuelKos/simple-rss"
 		self.non_bmp_map = dict.fromkeys(range(0x10000, maxunicode + 1), 0xfffd)
 		self.history = []
 		self.input = url
 		self.flag_back = False
 		self.flag_rss = False
 		self.helptxt = HELPTXT
-		# uncomment if you have icon:
-##		self.iconpath = ICONPATH
+		self.iconpath = ICONPATH
 		self.title('Simple RSS')
 		self.hdpi_screen = hdpi
 
@@ -192,9 +190,8 @@ class Browser(Toplevel):
 			self.font1 = Font(family='Noto Mono', size=24)
 			self.font2 = Font(family='Noto Mono', size=20)
 		
-		# uncomment if you have icon:
-##		self.img = Image("photo", file=self.iconpath)
-##		self.tk.call('wm','iconphoto', self._w, self.img)
+		self.icon = Image("photo", file=self.iconpath)
+		self.tk.call('wm','iconphoto', self._w, self.icon)
 		
 		self.rsslinks = RSSLINKS
 		self.u = rssfeed.RssFeed(RSSLINKS)

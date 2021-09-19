@@ -60,6 +60,5 @@ class RssFeed:
 			self._source = key    
 		else:
 			self._source = sorted(self._sources.keys())[key]
-
+			
 		self._titles, self._links = self._parser.parse(self._sources[self._source])
-		

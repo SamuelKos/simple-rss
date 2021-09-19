@@ -7,23 +7,19 @@ from re import sub
 from tkinter import *
 from tkinter.scrolledtext import ScrolledText
 from tkinter.font import Font
+from sys import maxunicode
 import rssfeed
 
 # Main-class is Browser and it is last at the bottom 
 
-#TODO: load feeds at startup and make a new class for them. 
-# When you choose a feed, titles are fetched from that class.
-# History should remember if view was a news-page or title-page.
-# self.hyperlink is in two places.
-
-# Files that needs to be supplied: ICON, FONT, SOURCES.LST
+#TODO: Files that needs to be supplied: ICON, FONT, SOURCES.LST
 
 
 
 # uncomment if you have icon:
 ##ICONPATH = "./icons/rssicon.png"
 
-RSSLINKS = r'./sources.lst'
+RSSLINKS = r'./mysources.lst'
 HELPTXT = '''
 	left: previous view
 	ESC:  usually the obvious action
@@ -93,7 +89,7 @@ class MyHTMLParser(HTMLParser):
 	''' Parse URL-links in HTML-page. Methods are all wrappers of those in 
 		parent-class, except chk_ignores. These are stored in a list:
 		self.addresses as tuples: (link-name, link-address). These tuples
-		are used (in Browser-class: get_html() and tag_link()) 
+		are used (in Browser-class: make_page() and tag_link()) 
 		to make hyper-links for tkinter Text-widget.
 		
 		Certain types of links are ignored to shorten the list.
@@ -178,6 +174,7 @@ class Browser(Toplevel):
 		super().__init__(root, class_='Simple RSS')
 		self.protocol("WM_DELETE_WINDOW", self.quit_me)
 		self.user_agent = "simple-rss"
+		self.non_bmp_map = dict.fromkeys(range(0x10000, maxunicode + 1), 0xfffd)
 		self.history = []
 		self.input = url
 		self.flag_back = False
@@ -213,12 +210,12 @@ class Browser(Toplevel):
 		self.entry.pack(side=LEFT, expand=True, fill=X)
 		self.entry.focus_set()
 		
-		self.btn_open=Button(self.framtop, font=self.font2, text='Open', command=self.chk)
+		self.btn_open=Button(self.framtop, font=self.font2, text='Open', command=self.make_titlepage)
 		self.btn_open.pack(side=LEFT)
 		
 		self.var = StringVar()
 		self.var.set(self.sources[0])
-		self.optionmenu = OptionMenu(self.framtop, self.var, *self.sources, command=self.chk)
+		self.optionmenu = OptionMenu(self.framtop, self.var, *self.sources, command=self.make_titlepage)
 		
 		# set font of dropdown button:
 		self.optionmenu.config(font=self.font2)
@@ -272,7 +269,7 @@ class Browser(Toplevel):
 		self.h.ignore_links = True
 		self.h.ignore_images = True
 		
-		self.bind("<Return>", lambda a: self.gethtml())
+		self.bind("<Return>", lambda a: self.make_page())
 		self.bind("<Escape>", lambda e: self.iconify())
 		self.bind("<Left>", lambda event: self.back_hist(event))
 		self.bind("<Button-3>", lambda event: self.raise_popup(event))
@@ -287,7 +284,7 @@ class Browser(Toplevel):
 		######## End of Layout ###############################################
 		
 		if self.input:
-			self.gethtml(self.input)
+			self.make_page(self.input)
 
 		
 	def raise_popup(self, event, *args):
@@ -305,11 +302,19 @@ class Browser(Toplevel):
 		return 'break'
 		
 		
-	def chk(self, event=None):
+	def make_titlepage(self, event=None):
 		''' Fetch selected feed with rssfeed (titles and links).
 			Then make title-page with hyperlinks. 
 		'''
 		source = self.var.get()
+		
+		if not self.flag_back:
+			self.history.append(('titlepage', source))
+		else:
+			source = self.history[-1][1]
+			self.flag_back = False
+		
+		self.title(source)
 		self.u.select_source(source)
 		count = len(self.u._titles)
 		self.wipe()
@@ -340,13 +345,13 @@ class Browser(Toplevel):
 	def stop_editsources(self, event=None):
 		self.wipe()
 		
-		self.bind("<Return>", lambda a: self.gethtml())
+		self.bind("<Return>", lambda a: self.make_page())
 		self.bind("<Escape>", lambda e: self.iconify())
 		self.bind("<Left>", lambda event: self.back_hist(event))
 		
-		self.btn_open.config(text='Open', command=self.chk)
+		self.btn_open.config(text='Open', command=self.make_titlepage)
 		
-		self.optionmenu = OptionMenu(self.framtop, self.var, *self.sources, command=self.chk)
+		self.optionmenu = OptionMenu(self.framtop, self.var, *self.sources, command=self.make_titlepage)
 		self.optionmenu.config(font=self.font2)
 		menu = self.nametowidget(self.optionmenu.menuname)
 		menu.config(font=self.font2)
@@ -418,6 +423,7 @@ class Browser(Toplevel):
 		
 
 	def back_hist(self, event=None, flag_help=False):
+	
 		if event != None:
 			if 'entry' in str(event.widget).split('.')[-1]:
 				return
@@ -426,11 +432,20 @@ class Browser(Toplevel):
 		
 		if flag_help and len(self.history) > 0:
 			self.wipe()
-			self.gethtml(self.history[-1])
-		elif len(self.history) > 1:        
+			
+			if self.history[-1][0] == 'titlepage':
+				self.make_titlepage(self.history[-1][1])
+			else:
+				self.make_page(self.history[-1][1])
+				
+		elif len(self.history) > 1:
 			self.history = self.history[:-1]
 			self.wipe()
-			self.gethtml(self.history[-1])
+			
+			if self.history[-1][0] == 'titlepage':
+				self.make_titlepage(self.history[-1][1])
+			else:
+				self.make_page(link=self.history[-1][1])
 		else:
 			self.flag_back = False 
 
@@ -469,15 +484,16 @@ class Browser(Toplevel):
 			
 			if self.flag_rss:
 				self.input = addr
-				self.gethtml(addr, i)
+				self.make_page(addr, i)
 			else:
-				self.gethtml(addr)
+				self.make_page(addr)
 			
 		if event.num == 3:# mouse right
 			self.clipboard_append(addr)			
 			
 			
-	def gethtml(self, link=None, title_index=None):     
+	def make_page(self, link=None, title_index=None):
+		self.title('Simple RSS')
 
 		# address is not from hyperlink: 
 		if link == None or self.input:
@@ -505,7 +521,7 @@ class Browser(Toplevel):
 			self.parser.domain = self.parser.domain[:-1]
 
 		if not self.flag_back:
-			self.history.append(link)
+			self.history.append(('page', link))
 			
 		self.flag_back = False
 		self.flag_rss = False
@@ -520,6 +536,7 @@ class Browser(Toplevel):
 		try:
 			res = request.urlopen(req, timeout = 8)
 			res = res.read().decode('utf-8')
+			res = res.translate(self.non_bmp_map)
 			self.parser.feed(res) # HTMLParser parses links               
 			s = self.h.handle(res)    # html2text parses page
 			

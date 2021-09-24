@@ -169,7 +169,7 @@ class Browser(Toplevel):
 
 	'''
 
-	def __init__(self, root, url=None, hdpi=True):
+	def __init__(self, root, url=None, hdpi=False):
 		super().__init__(root, class_='Simple RSS')
 		self.protocol("WM_DELETE_WINDOW", self.quit_me)
 		self.user_agent = "https://github.com/SamuelKos/simple-rss"
@@ -311,7 +311,7 @@ class Browser(Toplevel):
 			source = self.history[-1][1]
 			self.flag_back = False
 		
-		self.title(source)
+		self.title(source.upper() + ': %d' % len(self.history))
 		self.u.select_source(source)
 		count = len(self.u._titles)
 		self.wipe()
@@ -490,7 +490,6 @@ class Browser(Toplevel):
 			
 			
 	def make_page(self, link=None, title_index=None):
-		self.title('Simple RSS')
 
 		# address is not from hyperlink: 
 		if link == None or self.input:
@@ -518,11 +517,16 @@ class Browser(Toplevel):
 			self.parser.domain = self.parser.domain[:-1]
 
 		if not self.flag_back:
-			self.history.append(('page', link))
+			if title_index:
+				pattern = self.u._titles[title_index].split()[:3]
+				self.history.append(('page', link, pattern))
+			else:
+				self.history.append(('page', link, False))
 			
 		self.flag_back = False
 		self.flag_rss = False
 		self.entry.insert(END, link)
+		self.title('Simple RSS: %d' % len(self.history))
 		
 		req = request.Request(link)
 		req.add_header('User-Agent', self.user_agent)
@@ -544,11 +548,11 @@ class Browser(Toplevel):
 				name = item[0] +" "+  item[1] +"\n"
 				self.text2.insert(INSERT, name, self.hyperlink.add(self.tag_link))            
 			
-			if title_index != None:
+			if self.history[-1][2]:
 				# try to get linenum of title in page. Pattern is list
 				# with three first words in title.
 				# For skipping to right place in page.
-				pattern = self.u._titles[title_index].split()[:3]
+				pattern = self.history[-1][2]
 				pos = self.text1.search(pattern, '1.0', END)
 				if pos:
 					self.text1.see(pos)
@@ -568,6 +572,7 @@ class Browser(Toplevel):
 
 
 if __name__ == '__main__':
-	root = Tk().withdraw()
-	b = Browser(root)
+	r = Tk().withdraw()
+	b = Browser(r)
 	b.mainloop()
+

@@ -7,8 +7,10 @@ from re import sub
 from tkinter import *
 from tkinter.scrolledtext import ScrolledText
 from tkinter.font import Font
+import tkinter
 from sys import maxunicode
 import rssfeed
+import font_chooser
 
 # Main-class is Browser and it is last at the bottom 
 
@@ -16,7 +18,7 @@ import rssfeed
 
 
 
-ICONPATH = r'./rssicon.png'
+ICONPATH = r'./icons/rssicon.png'
 
 RSSLINKS = r'./sources.lst'
 HELPTXT = '''
@@ -171,6 +173,7 @@ class Browser(Toplevel):
 
 	def __init__(self, root, url=None, hdpi=False):
 		super().__init__(root, class_='Simple RSS')
+		self.top = root
 		self.protocol("WM_DELETE_WINDOW", self.quit_me)
 		self.user_agent = "https://github.com/SamuelKos/simple-rss"
 		self.non_bmp_map = dict.fromkeys(range(0x10000, maxunicode + 1), 0xfffd)
@@ -182,13 +185,29 @@ class Browser(Toplevel):
 		self.iconpath = ICONPATH
 		self.title('Simple RSS')
 		self.hdpi_screen = hdpi
+		self.fontname = None
+		self.goodfonts = [
+					'Noto Mono',
+					'Bitstream Vera Sans Mono',
+					'Liberation Mono',
+					'Inconsolata'
+					]
+
+		for fontname in self.goodfonts:
+			if fontname in tkinter.font.families():
+				self.fontname = fontname
+				break
+		
+		if not self.fontname:
+			self.fontname = tkinter.font.families()[0]
+			print(f'WARNING: RANDOM FONT NAMED "{self.fontname.upper()}" IN USE. Select a better font with: ctrl-p')
 
 		if self.hdpi_screen == False:
-			self.font1 = Font(family='Noto Mono', size=12)
-			self.font2 = Font(family='Noto Mono', size=10)
+			self.font1 = Font(family=self.fontname, size=12)
+			self.font2 = Font(family=self.fontname, size=10)
 		else:
-			self.font1 = Font(family='Noto Mono', size=24)
-			self.font2 = Font(family='Noto Mono', size=20)
+			self.font1 = Font(family=self.fontname, size=24)
+			self.font2 = Font(family=self.fontname, size=20)
 		
 		self.icon = Image("photo", file=self.iconpath)
 		self.tk.call('wm','iconphoto', self._w, self.icon)
@@ -270,6 +289,7 @@ class Browser(Toplevel):
 		self.bind("<Escape>", lambda e: self.iconify())
 		self.bind("<Left>", lambda event: self.back_hist(event))
 		self.bind("<Button-3>", lambda event: self.raise_popup(event))
+		self.bind("<Control-p>", self.font_choose)
 		
 		self.popup_whohasfocus = None
 		self.popup = Menu(self, font=self.font2, tearoff=0)
@@ -277,12 +297,18 @@ class Browser(Toplevel):
 		# so that popup would go away when clicked somewhere else
 		
 		self.popup.add_command(label=" editsources", command=self.editsources)
+		self.popup.add_command(label=" choose font", command=self.font_choose)
 		self.popup.add_command(label="        help", command=self.help)
 		######## End of Layout ###############################################
 		
 		if self.input:
 			self.make_page(self.input)
 
+	
+	def font_choose(self, event=None):
+		self.choose = font_chooser.Fontchooser(self.top, self.font1)
+		return 'break'
+	
 		
 	def raise_popup(self, event, *args):
 		self.popup_whohasfocus = event.widget

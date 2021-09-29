@@ -19,13 +19,12 @@ import rssfeed
 
 # Main-class is Browser and it is last at the bottom 
 
-#TODO: clipboard works only in python shell. push this file to main. no comments
-
+#TODO: clipboard works only in python shell.
 
 
 ICONPATH = r'./icons/rssicon.png'
 
-RSSLINKS = r'./mysources.lst'
+RSSLINKS = r'./sources.lst'
 HELPTXT = '''
 	left: previous view
 	ESC:  usually the obvious action

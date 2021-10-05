@@ -1,6 +1,6 @@
 # simple-rss
 Simple RSS Reader with GUI. Tested to work with Debian Buster and Bullseye.
-* Update: Added font chooser
+* Update: better font-chooser
 
 # Installing
 debian-packages required: python3-tk python3-venv

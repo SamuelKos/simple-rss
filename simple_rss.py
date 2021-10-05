@@ -19,7 +19,7 @@ import rssfeed
 
 # Main-class is Browser and it is last at the bottom 
 
-#TODO: clipboard works only in python shell.
+#TODO: clipboard works only in python shell. Make history save everything. 
 
 
 ICONPATH = r'./icons/rssicon.png'
@@ -175,7 +175,7 @@ class Browser(tkinter.Toplevel):
 
 	'''
 
-	def __init__(self, root, url=None, hdpi=False):
+	def __init__(self, root, url=None, hdpi=True):
 		super().__init__(root, class_='Simple RSS')
 		self.top = root
 		self.protocol("WM_DELETE_WINDOW", self.quit_me)
@@ -310,7 +310,7 @@ class Browser(tkinter.Toplevel):
 
 	
 	def font_choose(self, event=None):
-		self.choose = font_chooser.Fontchooser(self.top, self.font1)
+		self.choose = font_chooser.Fontchooser(self.top, [self.font1, self.font2])
 		return 'break'
 	
 		

@@ -1,5 +1,3 @@
-#TODO: clipboard works only in python shell.
-
 # from standard library
 import urllib.request
 import urllib.error
@@ -24,7 +22,7 @@ import rssfeed
 # Constants used in Browser-class:
 
 ICONPATH = r'./icons/rssicon.png'
-RSSLINKS = r'./sources.lst'
+RSSLINKS = r'./mysources.lst'
 HELPTXT = '''
 	left: 	Previous page
 	Esc:	Close help / Close edit-sources / Iconify window
@@ -532,6 +530,7 @@ class Browser(tkinter.Toplevel):
 				self.make_page(addr)
 			
 		if event.num == 3:# mouse right
+			self.clipboard_clear()
 			self.clipboard_append(addr)			
 			
 			

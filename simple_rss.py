@@ -1,3 +1,5 @@
+#TODO: clipboard works only in python shell.
+
 # from standard library
 import urllib.request
 import urllib.error
@@ -16,23 +18,22 @@ import html2text
 import font_chooser
 import rssfeed
 
+# Main-class is Browser and it is last at the bottom
+#####################################################
 
-# Main-class is Browser and it is last at the bottom 
-
-#TODO: clipboard works only in python shell. Make history save everything. 
-
+# Constants used in Browser-class:
 
 ICONPATH = r'./icons/rssicon.png'
-
 RSSLINKS = r'./sources.lst'
 HELPTXT = '''
-	left: previous view
-	ESC:  usually the obvious action
+	left: 	Previous page
+	Esc:	Close help / Close edit-sources / Iconify window
+	ctrl-p:	Font chooser
 		
 	At bottom-pane, when clicked address with mouse-right: copy link
 	
 	When editing sources, leave an empty line after last line and then
-	write name for the feed in dropdown-menu and then add the
+	write name for the feed to be in the dropdown-menu and then add
 	URL-address of the RSS-feed to next line.
 
 		
@@ -89,7 +90,6 @@ class HyperlinkManager:
 				return
 			
 
-
 class MyHTMLParser(html.parser.HTMLParser):
 	''' Parse URL-links in HTML-page. Methods are all wrappers of those in 
 		parent-class, except chk_ignores. These are stored in a list:
@@ -100,6 +100,7 @@ class MyHTMLParser(html.parser.HTMLParser):
 		Certain types of links are ignored to shorten the list.
 	'''
 	
+	
 	def __init__(self):        
 		super().__init__()
 		self.flag = False
@@ -108,6 +109,7 @@ class MyHTMLParser(html.parser.HTMLParser):
 		self.linkname = ""        
 		self.addresses = list()
 		self.domain = ""
+	
 	
 	def handle_starttag(self, tag, attrs):
 		if tag == 'a':
@@ -163,7 +165,6 @@ class MyHTMLParser(html.parser.HTMLParser):
 			self.flag = False
 
 
-
 class Browser(tkinter.Toplevel):
 	''' RSS-browser made with tkinter PanedWindow and ScrolledText -widgets
 		to name a few. It needs a root-window to run event loop. So:
@@ -186,7 +187,6 @@ class Browser(tkinter.Toplevel):
 		self.flag_back = False
 		self.flag_rss = False
 		self.helptxt = HELPTXT
-		self.iconpath = ICONPATH
 		self.title('Simple RSS')
 		self.hdpi_screen = hdpi
 		self.fontname = None
@@ -205,16 +205,20 @@ class Browser(tkinter.Toplevel):
 		if not self.fontname:
 			self.fontname = tkinter.font.families()[0]
 			print(f'WARNING: RANDOM FONT NAMED "{self.fontname.upper()}" IN USE. Select a better font with: ctrl-p')
+			
+		self.font1 = tkinter.font.Font(family=self.fontname, size=24)
+		self.font2 = tkinter.font.Font(family=self.fontname, size=20)
 
 		if self.hdpi_screen == False:
-			self.font1 = tkinter.font.Font(family=self.fontname, size=12)
-			self.font2 = tkinter.font.Font(family=self.fontname, size=10)
-		else:
-			self.font1 = tkinter.font.Font(family=self.fontname, size=24)
-			self.font2 = tkinter.font.Font(family=self.fontname, size=20)
+			self.font1['size'] = 12
+			self.font2['size'] = 10
 		
-		self.icon = tkinter.Image("photo", file=self.iconpath)
-		self.tk.call('wm','iconphoto', self._w, self.icon)
+		if ICONPATH:
+			try:
+				self.icon = tkinter.Image("photo", file=ICONPATH)
+				self.tk.call('wm','iconphoto', self._w, self.icon)
+			except tkinter.TclError as e:
+				print(e)
 		
 		self.rsslinks = RSSLINKS
 		self.u = rssfeed.RssFeed(RSSLINKS)
@@ -257,7 +261,7 @@ class Browser(tkinter.Toplevel):
 		self.text1 = tkinter.scrolledtext.ScrolledText(self.fram1, font=self.font1, tabstyle='wordprocessor', background='#000000', foreground='#D3D7CF', insertbackground='#D3D7CF', blockcursor=True)
 		self.text2 = tkinter.scrolledtext.ScrolledText(self.fram2, font=self.font2, background='#000000', foreground='#D3D7CF')
 		
-		if self.hdpi_screen:
+		if self.hdpi_screen == True:
 			self.text1.vbar.config(width=30)
 			self.text2.vbar.config(width=30)
 			self.text1.vbar.config(elementborderwidth=4)
@@ -342,9 +346,19 @@ class Browser(tkinter.Toplevel):
 			self.flag_back = False
 		
 		self.title(source.upper() + ': %d' % len(self.history))
-		self.u.select_source(source)
-		count = len(self.u._titles)
 		self.wipe()
+		
+		try:
+			self.u.select_source(source)
+		except urllib.error.URLError as err:
+			s  = 'Something went wrong:\n\n%s' % err.reason
+			self.text1.insert(tkinter.END, s)
+			self.flag_rss = True
+			self.text1.config(state='disabled')
+			self.text2.config(state='disabled')
+			return
+			
+		count = len(self.u._titles)
 		self.hyperlink = HyperlinkManager(self.text1)
 		self.flag_rss = True
 	
@@ -590,9 +604,8 @@ class Browser(tkinter.Toplevel):
 					self.text1.see(pos)
 					
 		except urllib.error.URLError as err:
-			s  = 'Something went wrong:\n\n%s\n\nErrorcode:\n\n%s' % (link, err.reason)
+			s  = 'Something went wrong:\n\n%s' % err.reason
 			self.text1.insert(tkinter.END, s)
-		
 		
 		self.text1.config(state='disabled')
 		self.text2.config(state='disabled')

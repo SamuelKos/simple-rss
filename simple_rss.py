@@ -492,6 +492,7 @@ class Browser(tkinter.Toplevel):
 			else:
 				self.make_page(link=self.history[-1][1])
 		else:
+			self.bell()
 			self.flag_back = False 
 
 

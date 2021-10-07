@@ -22,7 +22,7 @@ import rssfeed
 # Constants used in Browser-class:
 
 ICONPATH = r'./icons/rssicon.png'
-RSSLINKS = r'./mysources.lst'
+RSSLINKS = r'./sources.txt'
 HELPTXT = '''
 	left: 	Previous page
 	Esc:	Close help / Close edit-sources / Iconify window
@@ -397,6 +397,12 @@ class Browser(tkinter.Toplevel):
 		self.optionmenu.pack(side=tkinter.LEFT)
 		
 		self.entry.config(state='normal')
+		
+		# Parse history for removed feeds:
+		for i,item in enumerate(self.history):
+			if item[0] == 'titlepage' and item[1] not in self.sources:
+				_ = self.history.pop(i)
+		
 		self.back_hist(flag_help=True)
 		
 		if event != None:

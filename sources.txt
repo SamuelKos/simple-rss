@@ -1,0 +1,1 @@
+Opensrc,https://opensource.com/feed;LeMonde,https://www.lemonde.fr/international/rss_full.xml;NYT,https://rss.nytimes.com/services/xml/rss/nyt/World.xml

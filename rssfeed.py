@@ -1,6 +1,3 @@
-#TODO: dump pickle
-
-import pickle
 import simple_rss_parser
 
 
@@ -18,13 +15,27 @@ class RssFeed:
 
 
 	def _save(self, file, data):
-		with open(file, 'bw') as f:
-			pickle.dump(data, f)
+		with open(file, 'w') as f:
+			tmp = ''
+			
+			for key in data:
+				pattern = key +','+ data[key] +';'
+				tmp += pattern
+			
+			tmp = tmp[:-1]
+			f.write(tmp)
 
-
+			
 	def _load(self, file):
-		with open(file, 'br') as f:
-			return pickle.load(f)
+		with open(file, 'r') as f:
+			tmp = f.read().strip().split(';')
+			d = dict()
+			
+			for item in tmp:
+				key, val = item.split(',')
+				d[key] = val
+			
+			return d
 
 
 	def add_source(self, key, addr):

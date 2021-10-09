@@ -204,12 +204,18 @@ class Browser(tkinter.Toplevel):
 			self.fontname = tkinter.font.families()[0]
 			print(f'WARNING: RANDOM FONT NAMED "{self.fontname.upper()}" IN USE. Select a better font with: ctrl-p')
 			
-		self.font1 = tkinter.font.Font(family=self.fontname, size=24)
-		self.font2 = tkinter.font.Font(family=self.fontname, size=20)
+		self.font1 = tkinter.font.Font(family=self.fontname, size=12)
+		self.font2 = tkinter.font.Font(family=self.fontname, size=10)
+		
+		# Not setting font-size separately whether hdpi-screen or not. Only
+		# scrollbar width. Because of possible font-scaling by OS like in Debian
+		# Bullseye. So if using hdpi==false monitor you are fine and if using
+		# hdpi-screen==true and there is font-scaling by OS you are fine.
+		# Only if using hdpi-true monitor and there is no font-scaling by OS
+		# or whatever is responsible of such a thing then you have a problem
+		# with default font size being too small. But you can change it with
+		# font-chooser.
 
-		if self.hdpi_screen == False:
-			self.font1['size'] = 12
-			self.font2['size'] = 10
 		
 		if ICONPATH:
 			try:

@@ -39,14 +39,14 @@ class RssFeed:
 
 
 	def add_source(self, key, addr):
-		''' Add new feed to sources: key is name for dropdown-menu and 
+		'''	Add new feed to sources: key is name for dropdown-menu and 
 			addr is its URL-address.
 		'''
 		self._sources[key] = addr
 		
 		
 	def del_source(self, key=None):
-		''' Key can be the name of the feed or index-number of the feed.
+		'''	Key can be the name of the feed or index-number of the feed.
 			Remove one feed from sources.
 		'''
 		if isinstance(key, int): key = sorted(self._sources.keys())[key]

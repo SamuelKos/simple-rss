@@ -14,7 +14,7 @@ class Parser:
 	
 
 	def parse(self, link):
-		''' link is URL-address to RSS-feed written in XML.
+		'''	link is URL-address to RSS-feed written in XML.
 			Returns tuple containing two list: 
 			news-titles and links to news-page.
 		'''

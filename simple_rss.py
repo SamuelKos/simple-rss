@@ -25,22 +25,22 @@ import rssfeed
 ICONPATH = r'./icons/rssicon.png'
 RSSLINKS = r'./sources.txt'
 HELPTXT = '''
-	left: 	Previous page
-	Esc:	Close help / Close edit-sources / Iconify window
+  left: Previous page
+  Esc:	Close help / Close edit-sources / Iconify window
 	
-	ctrl-period: 	increase titlepage tabstop
-	ctrl-comma:		decrease titlepage tabstop
-	ctrl-plus: 		increase scrollbar width
-	ctrl-minus:		decrease scrollbar width
+  ctrl-period:	increase titlepage tabstop
+  ctrl-comma:	decrease titlepage tabstop
+  ctrl-plus: 	increase scrollbar width
+  ctrl-minus:	decrease scrollbar width
 	
-	ctrl-p:	Font chooser
+  ctrl-p:	Font chooser
 	
 	
-	At bottom-pane, when clicked address with mouse-right: copy link
+  At bottom-pane, when clicked address with mouse-right: copy link
 	
-	When editing sources, leave an empty line after last line and then
-	write name for the feed to be in the dropdown-menu and then add
-	URL-address of the RSS-feed to next line.
+  When editing sources, leave an empty line after last line and then
+  write name for the feed to be in the dropdown-menu and then add
+  URL-address of the RSS-feed to next line.
 
 		
 		'''
@@ -324,7 +324,7 @@ class Browser(tkinter.Toplevel):
 
 	
 	def increase_tabstop_width(self, event=None):
-		''' Increase width of first tabstop in titlepage.
+		'''	Increase width of first tabstop in titlepage.
 			Shortcut: Ctrl-period
 		'''
 		if not self.flag_rss:
@@ -346,7 +346,7 @@ class Browser(tkinter.Toplevel):
 
 
 	def decrease_tabstop_width(self, event=None):
-		''' Increase width of first tabstop in titlepage.
+		'''	Increase width of first tabstop in titlepage.
 			Shortcut: Ctrl-comma
 		'''
 		if not self.flag_rss:
@@ -368,7 +368,7 @@ class Browser(tkinter.Toplevel):
 		
 	
 	def increase_scrollbar_width(self, event=None):
-		''' Change width of scrollbars.
+		'''	Change width of scrollbars.
 			Shortcut: Ctrl-plus
 		'''
 		if self.scrollbar_width >= 100:
@@ -387,7 +387,7 @@ class Browser(tkinter.Toplevel):
 		
 		
 	def decrease_scrollbar_width(self, event=None):
-		''' Change width of scrollbars.
+		'''	Change width of scrollbars.
 			Shortcut: Ctrl-minus
 		'''
 		if self.scrollbar_width <= 0:
@@ -426,7 +426,7 @@ class Browser(tkinter.Toplevel):
 		
 		
 	def make_titlepage(self, event=None):
-		''' Fetch selected feed with rssfeed (titles and links).
+		'''	Fetch selected feed with rssfeed (titles and links).
 			Then make title-page with hyperlinks. 
 		'''
 		source = self.var.get()

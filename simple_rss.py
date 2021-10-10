@@ -1,3 +1,4 @@
+#TODO: links should be underlined when mouse over like in simple-editor.
 # from standard library
 import urllib.request
 import urllib.error
@@ -26,8 +27,15 @@ RSSLINKS = r'./sources.txt'
 HELPTXT = '''
 	left: 	Previous page
 	Esc:	Close help / Close edit-sources / Iconify window
+	
+	ctrl-period: 	increase titlepage tabstop
+	ctrl-comma:		decrease titlepage tabstop
+	ctrl-plus: 		increase scrollbar width
+	ctrl-minus:		decrease scrollbar width
+	
 	ctrl-p:	Font chooser
-		
+	
+	
 	At bottom-pane, when clicked address with mouse-right: copy link
 	
 	When editing sources, leave an empty line after last line and then
@@ -174,7 +182,7 @@ class Browser(tkinter.Toplevel):
 
 	'''
 
-	def __init__(self, root, url=None, hdpi=True):
+	def __init__(self, root, url=None):
 		super().__init__(root, class_='Simple RSS')
 		self.top = root
 		self.protocol("WM_DELETE_WINDOW", self.quit_me)
@@ -186,7 +194,6 @@ class Browser(tkinter.Toplevel):
 		self.flag_rss = False
 		self.helptxt = HELPTXT
 		self.title('Simple RSS')
-		self.hdpi_screen = hdpi
 		self.fontname = None
 		self.goodfonts = [
 					'Noto Mono',
@@ -215,7 +222,6 @@ class Browser(tkinter.Toplevel):
 		# or whatever is responsible of such a thing then you have a problem
 		# with default font size being too small. But you can change it with
 		# font-chooser.
-
 		
 		if ICONPATH:
 			try:
@@ -265,20 +271,16 @@ class Browser(tkinter.Toplevel):
 		self.text1 = tkinter.scrolledtext.ScrolledText(self.fram1, font=self.font1, tabstyle='wordprocessor', background='#000000', foreground='#D3D7CF', insertbackground='#D3D7CF', blockcursor=True)
 		self.text2 = tkinter.scrolledtext.ScrolledText(self.fram2, font=self.font2, background='#000000', foreground='#D3D7CF')
 		
-		if self.hdpi_screen == True:
-			self.text1.vbar.config(width=30)
-			self.text2.vbar.config(width=30)
-			self.text1.vbar.config(elementborderwidth=4)
-			self.text2.vbar.config(elementborderwidth=4)
-			self.titletabs=('2c', )
-			self.lmarg2='2c'
-		else:
-			self.text1.vbar.config(width=20)
-			self.text2.vbar.config(width=20)
-			self.text1.vbar.config(elementborderwidth=3)
-			self.text2.vbar.config(elementborderwidth=3)
-			self.titletabs=('1c', )
-			self.lmarg2='1c'
+		self.elementborderwidth = 4
+		self.scrollbar_width = 30
+		self.first_tabstop = 2
+
+		self.text1.vbar.config(elementborderwidth=self.elementborderwidth)
+		self.text2.vbar.config(elementborderwidth=self.elementborderwidth)
+		self.text1.vbar.config(width=self.scrollbar_width)
+		self.text2.vbar.config(width=self.scrollbar_width)
+		self.titletabs=(f'{self.first_tabstop}c', )
+		self.lmarg2=f'{self.first_tabstop}c'
 
 		self.text1.config(state='disabled')
 		self.text2.config(state='disabled')
@@ -297,11 +299,15 @@ class Browser(tkinter.Toplevel):
 		self.h.ignore_links = True
 		self.h.ignore_images = True
 		
-		self.bind("<Return>", lambda a: self.make_page())
-		self.bind("<Escape>", lambda e: self.iconify())
-		self.bind("<Left>", lambda event: self.back_hist(event))
-		self.bind("<Button-3>", lambda event: self.raise_popup(event))
 		self.bind("<Control-p>", self.font_choose)
+		self.bind("<Escape>", lambda e: self.iconify())
+		self.bind("<Return>", lambda a: self.make_page())
+		self.bind("<Left>", lambda event: self.back_hist(event))
+		self.bind("<Control-comma>", self.decrease_tabstop_width)
+		self.bind("<Control-period>", self.increase_tabstop_width)
+		self.bind("<Control-plus>", self.increase_scrollbar_width)
+		self.bind("<Control-minus>", self.decrease_scrollbar_width)
+		self.bind("<Button-3>", lambda event: self.raise_popup(event))
 		
 		self.popup_whohasfocus = None
 		self.popup = tkinter.Menu(self, font=self.font2, tearoff=0)
@@ -317,6 +323,88 @@ class Browser(tkinter.Toplevel):
 			self.make_page(self.input)
 
 	
+	def increase_tabstop_width(self, event=None):
+		''' Increase width of first tabstop in titlepage.
+			Shortcut: Ctrl-period
+		'''
+		if not self.flag_rss:
+			self.bell()
+			return 'break'
+		
+		if self.first_tabstop >= 10:
+			self.bell()
+			return 'break'
+			
+		self.first_tabstop += 0.2
+		
+		self.titletabs = (f'{self.first_tabstop}c', )
+		self.lmarg2 = f'{self.first_tabstop}c'
+		
+		self.text1.tag_config('indent_tag', lmargin2=self.lmarg2, tabs=self.titletabs)
+		
+		return 'break'
+
+
+	def decrease_tabstop_width(self, event=None):
+		''' Increase width of first tabstop in titlepage.
+			Shortcut: Ctrl-comma
+		'''
+		if not self.flag_rss:
+			self.bell()
+			return 'break'
+		
+		if self.first_tabstop <= 1:
+			self.bell()
+			return 'break'
+			
+		self.first_tabstop -= 0.2
+		
+		self.titletabs = (f'{self.first_tabstop}c', )
+		self.lmarg2 = f'{self.first_tabstop}c'
+		
+		self.text1.tag_config('indent_tag', lmargin2=self.lmarg2, tabs=self.titletabs)
+		
+		return 'break'
+		
+	
+	def increase_scrollbar_width(self, event=None):
+		''' Change width of scrollbars.
+			Shortcut: Ctrl-plus
+		'''
+		if self.scrollbar_width >= 100:
+			self.bell()
+			return 'break'
+			
+		self.scrollbar_width += 7
+		self.elementborderwidth += 1
+		
+		self.text1.vbar.config(width=self.scrollbar_width)
+		self.text2.vbar.config(width=self.scrollbar_width)
+		self.text1.vbar.config(elementborderwidth=self.elementborderwidth)
+		self.text2.vbar.config(elementborderwidth=self.elementborderwidth)
+	
+		return 'break'
+		
+		
+	def decrease_scrollbar_width(self, event=None):
+		''' Change width of scrollbars.
+			Shortcut: Ctrl-minus
+		'''
+		if self.scrollbar_width <= 0:
+			self.bell()
+			return 'break'
+			
+		self.scrollbar_width -= 7
+		self.elementborderwidth -= 1
+		
+		self.text1.vbar.config(width=self.scrollbar_width)
+		self.text2.vbar.config(width=self.scrollbar_width)
+		self.text1.vbar.config(elementborderwidth=self.elementborderwidth)
+		self.text2.vbar.config(elementborderwidth=self.elementborderwidth)
+			
+		return 'break'
+		
+		
 	def font_choose(self, event=None):
 		self.choose = font_chooser.Fontchooser(self.top, [self.font1, self.font2])
 		return 'break'

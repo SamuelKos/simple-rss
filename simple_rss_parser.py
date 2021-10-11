@@ -21,7 +21,9 @@ class Parser:
 		req = urllib.request.Request(link)
 		req.add_header('User-Agent', self.user_agent)
 		
-		r = urllib.request.urlopen(req, timeout = 8)
+		try: r = urllib.request.urlopen(req, timeout = 8)
+		except OSError: raise
+			
 		data_xml = html.unescape(r.read().decode('utf-8', 'ignore'))
 		
 		for tag in self.tags:

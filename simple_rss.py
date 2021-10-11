@@ -1,9 +1,7 @@
-#TODO: links should be underlined when mouse over like in simple-editor.
 # from standard library
 import urllib.request
 import urllib.error
 import html.parser
-import sys
 import re
 
 import tkinter.scrolledtext
@@ -42,62 +40,11 @@ HELPTXT = '''
   write name for the feed to be in the dropdown-menu and then add
   URL-address of the RSS-feed to next line.
 
-		
 		'''
-
-
-class HyperlinkManager:
-	''' Manage hyperlinks in tkinter Text-widget
-	'''
-
-	def __init__(self, text):
-		self.text = text
-		self.text.tag_config("hyper", underline=1)
-		self.text.tag_bind("hyper", "<Button-1>", self.lclick)
-		self.text.tag_bind("hyper", "<Button-3>", self.rclick)
-		# Had to make the same method with two different names:
-		# self.lclick and self.rclick for binding two events into a single tag.
-		self.text.tag_bind("hyper", "<Enter>", self.enter)
-		self.text.tag_bind("hyper", "<Leave>", self.leave)
-		self.reset()
-
-
-	def enter(self, event):
-		self.text.config(cursor="hand2")
-
-
-	def leave(self, event):
-		self.text.config(cursor="")
-
-
-	def reset(self):
-		self.links = {}
-
-
-	def add(self, action):
-		# Add an action to the manager. Returns tags to use in
-		# associated text widget.
-		tag = "hyper-%d" % len(self.links)
-		self.links[tag] = action
-		return "hyper", tag
-
-
-	def rclick(self, event):
-		for tag in self.text.tag_names(tkinter.CURRENT):
-			if tag[:6] == "hyper-":
-				self.links[tag](event)                
-				return
-
-
-	def lclick(self, event):
-		for tag in self.text.tag_names(tkinter.CURRENT):
-			if tag[:6] == "hyper-":
-				self.links[tag](event)                
-				return
-			
+		
 
 class MyHTMLParser(html.parser.HTMLParser):
-	''' Parse URL-links in HTML-page. Methods are all wrappers of those in 
+	'''	Parse URL-links in HTML-page. Methods are all wrappers of those in 
 		parent-class, except chk_ignores. These are stored in a list:
 		self.addresses as tuples: (link-name, link-address). These tuples
 		are used (in Browser-class: make_page() and tag_link()) 
@@ -172,7 +119,7 @@ class MyHTMLParser(html.parser.HTMLParser):
 
 
 class Browser(tkinter.Toplevel):
-	''' RSS-browser made with tkinter PanedWindow and ScrolledText -widgets
+	'''	RSS-browser made with tkinter PanedWindow and ScrolledText -widgets
 		to name a few. It needs a root-window to run event loop. So:
 		
 		import simple_rss
@@ -187,7 +134,6 @@ class Browser(tkinter.Toplevel):
 		self.top = root
 		self.protocol("WM_DELETE_WINDOW", self.quit_me)
 		self.user_agent = "https://github.com/SamuelKos/simple-rss"
-		self.non_bmp_map = dict.fromkeys(range(0x10000, sys.maxunicode + 1), 0xfffd)
 		self.history = []
 		self.input = url
 		self.flag_back = False
@@ -214,11 +160,11 @@ class Browser(tkinter.Toplevel):
 		self.font1 = tkinter.font.Font(family=self.fontname, size=12)
 		self.font2 = tkinter.font.Font(family=self.fontname, size=10)
 		
-		# Not setting font-size separately whether hdpi-screen or not. Only
-		# scrollbar width. Because of possible font-scaling by OS like in Debian
-		# Bullseye. So if using hdpi==false monitor you are fine and if using
-		# hdpi-screen==true and there is font-scaling by OS you are fine.
-		# Only if using hdpi-true monitor and there is no font-scaling by OS
+		# Not setting font-size separately whether hdpi-screen or not.
+		# Because of possible font-scaling by OS like in Debian Bullseye.
+		# So if using non hdpi monitor you are fine and if using
+		# hdpi-monitor and there is font-scaling by OS you are fine.
+		# Only if using hdpi-monitor and there is no font-scaling by OS
 		# or whatever is responsible of such a thing then you have a problem
 		# with default font size being too small. But you can change it with
 		# font-chooser.
@@ -268,8 +214,12 @@ class Browser(tkinter.Toplevel):
 		self.pane.add(self.fram1)
 		self.pane.add(self.fram2)
 
-		self.text1 = tkinter.scrolledtext.ScrolledText(self.fram1, font=self.font1, tabstyle='wordprocessor', background='#000000', foreground='#D3D7CF', insertbackground='#D3D7CF', blockcursor=True)
-		self.text2 = tkinter.scrolledtext.ScrolledText(self.fram2, font=self.font2, background='#000000', foreground='#D3D7CF')
+		self.text1 = tkinter.scrolledtext.ScrolledText(self.fram1,
+			font=self.font1, tabstyle='wordprocessor', background='#000000',
+			foreground='#D3D7CF', insertbackground='#D3D7CF', blockcursor=True)
+		
+		self.text2 = tkinter.scrolledtext.ScrolledText(self.fram2,
+			font=self.font2, background='#000000', foreground='#D3D7CF')
 		
 		self.elementborderwidth = 4
 		self.scrollbar_width = 30
@@ -284,30 +234,31 @@ class Browser(tkinter.Toplevel):
 
 		self.text1.config(state='disabled')
 		self.text2.config(state='disabled')
+		
 		# Because texts are disabled, we must make next lambda to
 		# be able copy text from them with ctrl-c:
-		self.text1.bind("<1>", lambda event: self.text1.focus_set())
-		self.text2.bind("<Enter>", self.enter)
-		self.text2.bind("<Leave>", self.leave)            
+		self.text1.bind("<1>",		lambda event: self.text1.focus_set())
+		self.text2.bind("<Enter>",	self.enter_text2)
+		self.text2.bind("<Leave>",	self.leave_text2)            
 		self.text1.pack(side=tkinter.BOTTOM,  expand=True, fill=tkinter.BOTH)
 		self.text2.pack(side=tkinter.BOTTOM,  expand=True, fill=tkinter.BOTH)
 		
-		# links at text2 are parsed with:
+		# links in text2 are parsed with:
 		self.parser = MyHTMLParser()
-		# page at text1 is parsed with:
+		# page in text1 is parsed with:
 		self.h = html2text.HTML2Text()
 		self.h.ignore_links = True
 		self.h.ignore_images = True
 		
-		self.bind("<Control-p>", self.font_choose)
-		self.bind("<Escape>", lambda e: self.iconify())
-		self.bind("<Return>", lambda a: self.make_page())
-		self.bind("<Left>", lambda event: self.back_hist(event))
-		self.bind("<Control-comma>", self.decrease_tabstop_width)
-		self.bind("<Control-period>", self.increase_tabstop_width)
-		self.bind("<Control-plus>", self.increase_scrollbar_width)
-		self.bind("<Control-minus>", self.decrease_scrollbar_width)
-		self.bind("<Button-3>", lambda event: self.raise_popup(event))
+		self.bind("<Control-p>",		self.font_choose)
+		self.bind("<Escape>",			lambda e: self.iconify())
+		self.bind("<Return>",			lambda a: self.make_page())
+		self.bind("<Left>",				lambda event: self.back_hist(event))
+		self.bind("<Control-comma>",	self.decrease_tabstop_width)
+		self.bind("<Control-period>",	self.increase_tabstop_width)
+		self.bind("<Control-plus>",		self.increase_scrollbar_width)
+		self.bind("<Control-minus>",	self.decrease_scrollbar_width)
+		self.bind("<Button-3>",			lambda event: self.raise_popup(event))
 		
 		self.popup_whohasfocus = None
 		self.popup = tkinter.Menu(self, font=self.font2, tearoff=0)
@@ -321,6 +272,49 @@ class Browser(tkinter.Toplevel):
 		
 		if self.input:
 			self.make_page(self.input)
+
+		
+	def enter(self, tagname, event=None):
+		''' When mousecursor enters hyperlink tagname.
+		'''
+		if self.flag_rss:
+			self.text1.config(cursor="hand2")
+			self.text1.tag_config(tagname, underline=1)
+		else:
+			self.text2.tag_config(tagname, underline=1)
+			
+		return 'break'
+
+
+	def leave(self, tagname, event=None):
+		''' When mousecursor leaves hyperlink tagname.
+		'''
+		if self.flag_rss:
+			self.text1.config(cursor="")
+			self.text1.tag_config(tagname, underline=0)
+		else:
+			self.text2.tag_config(tagname, underline=0)
+			
+		return 'break'
+		
+
+	def lclick(self, event=None):
+		'''	When hyperlink tagname is clicked.
+		''' 
+		self.tag_link(event)
+		return 'break'
+		
+		
+	def rclick(self, event=None):
+		'''	When hyperlink in text2 is clicked with mouse right.
+		''' 
+		i = int(self.text2.tag_names(tkinter.CURRENT)[0].split("-")[1])
+		addr = self.parser.addresses[i][1]
+		
+		self.clipboard_clear()
+		self.clipboard_append(addr)
+		
+		return 'break'
 
 	
 	def increase_tabstop_width(self, event=None):
@@ -340,7 +334,8 @@ class Browser(tkinter.Toplevel):
 		self.titletabs = (f'{self.first_tabstop}c', )
 		self.lmarg2 = f'{self.first_tabstop}c'
 		
-		self.text1.tag_config('indent_tag', lmargin2=self.lmarg2, tabs=self.titletabs)
+		self.text1.tag_config('indent_tag', lmargin2=self.lmarg2,
+			tabs=self.titletabs)
 		
 		return 'break'
 
@@ -362,7 +357,8 @@ class Browser(tkinter.Toplevel):
 		self.titletabs = (f'{self.first_tabstop}c', )
 		self.lmarg2 = f'{self.first_tabstop}c'
 		
-		self.text1.tag_config('indent_tag', lmargin2=self.lmarg2, tabs=self.titletabs)
+		self.text1.tag_config('indent_tag', lmargin2=self.lmarg2,
+			tabs=self.titletabs)
 		
 		return 'break'
 		
@@ -406,7 +402,9 @@ class Browser(tkinter.Toplevel):
 		
 		
 	def font_choose(self, event=None):
-		self.choose = font_chooser.Fontchooser(self.top, [self.font1, self.font2])
+		self.choose = font_chooser.Fontchooser(self.top,
+			[self.font1, self.font2])
+			
 		return 'break'
 	
 		
@@ -442,8 +440,8 @@ class Browser(tkinter.Toplevel):
 		
 		try:
 			self.u.select_source(source)
-		except urllib.error.URLError as err:
-			s  = 'Something went wrong:\n\n%s' % err.reason
+		except OSError as err: 			#urllib.error.URLError as err:
+			s  = 'Something went wrong:\n\n%s' % err.__str__()
 			self.text1.insert(tkinter.END, s)
 			self.flag_rss = True
 			self.text1.config(state='disabled')
@@ -451,16 +449,31 @@ class Browser(tkinter.Toplevel):
 			return
 			
 		count = len(self.u._titles)
-		self.hyperlink = HyperlinkManager(self.text1)
 		self.flag_rss = True
+		
+		for tag in self.text1.tag_names():
+				if 'hyper' in tag:
+					self.text1.tag_delete(tag)
 	
 		for i in range(count):
 			tmp = ''
 			title = self.u._titles[i]
 			addr = self.u._links[i]
 			self.parser.addresses.append((addr, addr))
-			self.text1.insert(tkinter.INSERT, str(i+1), self.hyperlink.add(self.tag_link))
-			tmp += ':\t%s' % title	
+			tagname = "hyper-%s" % i
+			self.text1.tag_config(tagname)
+			
+			self.text1.tag_bind(tagname, "<ButtonRelease-1>",
+					lambda event: self.lclick(event))
+				
+			self.text1.tag_bind(tagname, "<Enter>",
+				lambda event, arg=tagname: self.enter(arg, event))
+			
+			self.text1.tag_bind(tagname, "<Leave>",
+				lambda event, arg=tagname: self.leave(arg, event))
+			
+			self.text1.insert(tkinter.INSERT, str(i+1) +':', tagname)
+			tmp += '\t%s' % title	
 			tmp += '\n\n'
 			self.text1.insert(tkinter.END, tmp)
 		
@@ -521,7 +534,7 @@ class Browser(tkinter.Toplevel):
 			for i in range(len(names)):
 				data[names[i]] = addresses[i]
 
-			#save data with rssfeed.save() into sources.lst
+			#save data with rssfeed.save() into sources.txt
 			self.u._save(RSSLINKS, data)
 			self.u = rssfeed.RssFeed(RSSLINKS)
 			self.sources = list(self.u._sources.keys())
@@ -590,12 +603,12 @@ class Browser(tkinter.Toplevel):
 			self.flag_back = False 
 
 
-	def enter(self, event):
+	def enter_text2(self, event):
 		self.text2.config(cursor="hand2")
 		self.bind("<Button-3>", lambda e: self.rebind())
 
 
-	def leave(self, event):
+	def leave_text2(self, event):
 		self.text2.config(cursor="")
 		self.bind("<Button-3>", lambda event: self.raise_popup(event))
 	
@@ -615,10 +628,12 @@ class Browser(tkinter.Toplevel):
 			
 		
 	def tag_link(self, event):
+		
 		if self.flag_rss:
-			i = int(self.text1.tag_names(tkinter.CURRENT)[2].split("-")[1])
+			i = int(self.text1.tag_names(tkinter.CURRENT)[1].split("-")[1])
 		else:
-			i = int(self.text2.tag_names(tkinter.CURRENT)[1].split("-")[1])
+			i = int(self.text2.tag_names(tkinter.CURRENT)[0].split("-")[1])
+			
 		addr = self.parser.addresses[i][1]
 		
 		if event.num == 1:# mouse left
@@ -630,9 +645,7 @@ class Browser(tkinter.Toplevel):
 			else:
 				self.make_page(addr)
 			
-		if event.num == 3:# mouse right
-			self.clipboard_clear()
-			self.clipboard_append(addr)			
+			return 'break'
 			
 			
 	def make_page(self, link=None, title_index=None):
@@ -664,7 +677,15 @@ class Browser(tkinter.Toplevel):
 
 		if not self.flag_back:
 			if title_index:
-				pattern = self.u._titles[title_index].split()[:3]
+				# Try to get four words for better matching.
+				# If title is less than four words, skip page position fetching.
+				tmp = self.u._titles[title_index].split()
+				
+				if len(tmp) > 3:
+					pattern = ' '.join(tmp[:4])
+				else:
+					pattern = False
+				
 				self.history.append(('page', link, pattern))
 			else:
 				self.history.append(('page', link, False))
@@ -683,28 +704,45 @@ class Browser(tkinter.Toplevel):
 		try:
 			res = urllib.request.urlopen(req, timeout = 8)
 			res = res.read().decode('utf-8')
-			res = res.translate(self.non_bmp_map)
-			self.parser.feed(res) # HTMLParser parses links               
-			s = self.h.handle(res)    # html2text parses page
+			self.parser.feed(res)	# HTMLParser parses links               
+			s = self.h.handle(res)	# html2text parses page
 			
 			self.text1.insert(tkinter.END, s)
-			self.hyperlink = HyperlinkManager(self.text2)     
 			
-			for item in self.parser.addresses:
+			for tag in self.text2.tag_names():
+				if 'hyper' in tag:
+					self.text2.tag_delete(tag)
+			
+			for i,item in enumerate(self.parser.addresses):
+				tagname = "hyper-%s" % i
+				self.text2.tag_config(tagname)
+				
+				self.text2.tag_bind(tagname, "<ButtonRelease-1>", 
+					lambda event: self.lclick(event))
+					
+				self.text2.tag_bind(tagname, "<ButtonRelease-3>", 
+					lambda event: self.rclick(event))
+				
+				self.text2.tag_bind(tagname, "<Enter>", 
+					lambda event, arg=tagname: self.enter(arg, event))
+				
+				self.text2.tag_bind(tagname, "<Leave>", 
+					lambda event, arg=tagname: self.leave(arg, event))
+				
 				name = item[0] +" "+  item[1] +"\n"
-				self.text2.insert(tkinter.INSERT, name, self.hyperlink.add(self.tag_link))            
+				self.text2.insert(tkinter.INSERT, name, tagname)            
 			
 			if self.history[-1][2]:
-				# try to get linenum of title in page. Pattern is list
-				# with three first words in title.
+				# try to get linenum of title in page. Pattern is string
+				# with four first words in title.
 				# For skipping to right place in page.
 				pattern = self.history[-1][2]
 				pos = self.text1.search(pattern, '1.0', tkinter.END)
 				if pos:
 					self.text1.see(pos)
 					
-		except urllib.error.URLError as err:
-			s  = 'Something went wrong:\n\n%s' % err.reason
+		except OSError as err:		#urllib.error.URLError as err:
+			s  = 'Something went wrong:\n\n%s' % err.__str__()
 			self.text1.insert(tkinter.END, s)
 		
 		self.text1.config(state='disabled')

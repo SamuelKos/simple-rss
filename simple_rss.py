@@ -1,6 +1,5 @@
 # from standard library
 import urllib.request
-import urllib.error
 import html.parser
 import re
 
@@ -440,7 +439,7 @@ class Browser(tkinter.Toplevel):
 		
 		try:
 			self.u.select_source(source)
-		except OSError as err: 			#urllib.error.URLError as err:
+		except OSError as err:
 			s  = 'Something went wrong:\n\n%s' % err.__str__()
 			self.text1.insert(tkinter.END, s)
 			self.flag_rss = True
@@ -741,7 +740,7 @@ class Browser(tkinter.Toplevel):
 				if pos:
 					self.text1.see(pos)
 					
-		except OSError as err:		#urllib.error.URLError as err:
+		except OSError as err:
 			s  = 'Something went wrong:\n\n%s' % err.__str__()
 			self.text1.insert(tkinter.END, s)
 		

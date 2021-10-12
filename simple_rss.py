@@ -278,11 +278,8 @@ class Browser(tkinter.Toplevel):
 		'''
 		if self.flag_rss:
 			self.text1.config(cursor="hand2")
-			self.text1.tag_config(tagname, underline=1)
 		else:
 			self.text2.tag_config(tagname, underline=1)
-			
-		return 'break'
 
 
 	def leave(self, tagname, event=None):
@@ -290,18 +287,14 @@ class Browser(tkinter.Toplevel):
 		'''
 		if self.flag_rss:
 			self.text1.config(cursor="")
-			self.text1.tag_config(tagname, underline=0)
 		else:
 			self.text2.tag_config(tagname, underline=0)
-			
-		return 'break'
 		
 
 	def lclick(self, event=None):
 		'''	When hyperlink tagname is clicked.
 		''' 
 		self.tag_link(event)
-		return 'break'
 		
 		
 	def rclick(self, event=None):
@@ -312,8 +305,6 @@ class Browser(tkinter.Toplevel):
 		
 		self.clipboard_clear()
 		self.clipboard_append(addr)
-		
-		return 'break'
 
 	
 	def increase_tabstop_width(self, event=None):
@@ -460,7 +451,7 @@ class Browser(tkinter.Toplevel):
 			addr = self.u._links[i]
 			self.parser.addresses.append((addr, addr))
 			tagname = "hyper-%s" % i
-			self.text1.tag_config(tagname)
+			self.text1.tag_config(tagname, underline=1)
 			
 			self.text1.tag_bind(tagname, "<ButtonRelease-1>",
 					lambda event: self.lclick(event))
@@ -471,8 +462,8 @@ class Browser(tkinter.Toplevel):
 			self.text1.tag_bind(tagname, "<Leave>",
 				lambda event, arg=tagname: self.leave(arg, event))
 			
-			self.text1.insert(tkinter.INSERT, str(i+1) +':', tagname)
-			tmp += '\t%s' % title	
+			self.text1.insert(tkinter.INSERT, str(i+1), tagname)
+			tmp += ':\t%s' % title	
 			tmp += '\n\n'
 			self.text1.insert(tkinter.END, tmp)
 		
@@ -644,8 +635,6 @@ class Browser(tkinter.Toplevel):
 			else:
 				self.make_page(addr)
 			
-			return 'break'
-			
 			
 	def make_page(self, link=None, title_index=None):
 
@@ -675,7 +664,8 @@ class Browser(tkinter.Toplevel):
 			self.parser.domain = self.parser.domain[:-1]
 
 		if not self.flag_back:
-			if title_index:
+			if title_index != None:
+			
 				# Try to get four words for better matching.
 				# If title is less than four words, skip page position fetching.
 				tmp = self.u._titles[title_index].split()
@@ -702,6 +692,12 @@ class Browser(tkinter.Toplevel):
 		# Fetch html-page
 		try:
 			res = urllib.request.urlopen(req, timeout = 8)
+			
+		except OSError as err:
+			s  = 'Something went wrong:\n\n%s' % err.__str__()
+			self.text1.insert(tkinter.END, s)
+			
+		else:
 			res = res.read().decode('utf-8')
 			self.parser.feed(res)	# HTMLParser parses links               
 			s = self.h.handle(res)	# html2text parses page
@@ -739,10 +735,6 @@ class Browser(tkinter.Toplevel):
 				pos = self.text1.search(pattern, '1.0', tkinter.END)
 				if pos:
 					self.text1.see(pos)
-					
-		except OSError as err:
-			s  = 'Something went wrong:\n\n%s' % err.__str__()
-			self.text1.insert(tkinter.END, s)
 		
 		self.text1.config(state='disabled')
 		self.text2.config(state='disabled')

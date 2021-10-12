@@ -1,6 +1,7 @@
 # from standard library
 import urllib.request
 import html.parser
+import json
 import re
 
 import tkinter.scrolledtext
@@ -20,8 +21,9 @@ import rssfeed
 # Constants used in Browser-class:
 
 ICONPATH = r'./icons/rssicon.png'
+CONFPATH = r'./rss.cnf'
 RSSLINKS = r'./sources.txt'
-HELPTXT = '''
+HELPTEXT = '''
   left: Previous page
   Esc:	Close help / Close edit-sources / Iconify window
 	
@@ -31,6 +33,7 @@ HELPTXT = '''
   ctrl-minus:	decrease scrollbar width
 	
   ctrl-p:	Font chooser
+  ctrl-W:	Save configuration
 	
 	
   At bottom-pane, when clicked address with mouse-right: copy link
@@ -137,7 +140,7 @@ class Browser(tkinter.Toplevel):
 		self.input = url
 		self.flag_back = False
 		self.flag_rss = False
-		self.helptxt = HELPTXT
+		self.helptxt = HELPTEXT
 		self.title('Simple RSS')
 		self.fontname = None
 		self.goodfonts = [
@@ -250,6 +253,7 @@ class Browser(tkinter.Toplevel):
 		self.h.ignore_images = True
 		
 		self.bind("<Control-p>",		self.font_choose)
+		self.bind("<Control-W>",		self.save_config)
 		self.bind("<Escape>",			lambda e: self.iconify())
 		self.bind("<Return>",			lambda a: self.make_page())
 		self.bind("<Left>",				lambda event: self.back_hist(event))
@@ -267,11 +271,69 @@ class Browser(tkinter.Toplevel):
 		self.popup.add_command(label=" editsources", command=self.editsources)
 		self.popup.add_command(label=" choose font", command=self.font_choose)
 		self.popup.add_command(label="        help", command=self.help)
-		######## End of Layout ###############################################
 		
+		# Try to apply saved configurations:
+		try:
+			f = open(CONFPATH)
+		except OSError as e:
+			print(e.__str__())
+		else:
+			self.load_config(f)
+			f.close()
+			
 		if self.input:
 			self.make_page(self.input)
+		######## Init End ###############################################
 
+	
+	def save_config(self, event=None):
+		try:
+			f = open(CONFPATH, 'w', encoding='utf-8')
+		except OSError as e:
+			print(e.__str__())
+			print('Could not save configuration')
+		else:
+			data = dict()	
+			data['font1'] = self.font1.config()
+			data['font2'] = self.font2.config()
+			data['scrollbar_width'] = self.scrollbar_width
+			data['elementborderwidth'] = self.elementborderwidth
+			integer, decimal = str(float(self.first_tabstop)).split('.')
+			decimal = decimal[0]
+			data['first_tabstop_integer'] = integer
+			data['first_tabstop_decimal'] = decimal
+	
+			string_representation = json.dumps(data)
+			f.write(string_representation)
+			f.close()
+
+			
+	def load_config(self, fileobject):
+		string_representation = fileobject.read()
+		data = json.loads(string_representation)
+
+		self.font1.config(**data['font1'])
+		self.font2.config(**data['font2'])
+		
+		self.scrollbar_width 	= data['scrollbar_width']
+		self.elementborderwidth	= data['elementborderwidth']
+		
+		self.text1.vbar.config(width=self.scrollbar_width)
+		self.text2.vbar.config(width=self.scrollbar_width)
+		self.text1.vbar.config(elementborderwidth=self.elementborderwidth)
+		self.text2.vbar.config(elementborderwidth=self.elementborderwidth)
+		
+		integer = data['first_tabstop_integer']
+		decimal = data['first_tabstop_decimal']
+		tmp = integer +'.'+ decimal
+		self.first_tabstop = float(tmp)
+		
+		self.titletabs = (f'{self.first_tabstop}c', )
+		self.lmarg2 = f'{self.first_tabstop}c'
+		
+		self.text1.tag_config('indent_tag', lmargin2=self.lmarg2,
+			tabs=self.titletabs)
+			
 		
 	def enter(self, tagname, event=None):
 		''' When mousecursor enters hyperlink tagname.
@@ -667,11 +729,12 @@ class Browser(tkinter.Toplevel):
 			if title_index != None:
 			
 				# Try to get four words for better matching.
-				# If title is less than four words, skip page position fetching.
 				tmp = self.u._titles[title_index].split()
 				
 				if len(tmp) > 3:
-					pattern = ' '.join(tmp[:4])
+					pattern = ' '.join(tmp[:4])	
+				elif len(tmp) > 0:
+					pattern = ' '.join(tmp[:len(tmp)])
 				else:
 					pattern = False
 				
@@ -741,6 +804,7 @@ class Browser(tkinter.Toplevel):
 
 
 	def quit_me(self, event=None):
+		self.save_config()
 		self.quit()
 		self.destroy()
 

@@ -1,7 +1,9 @@
 # from standard library
 import urllib.request
 import html.parser
+import random
 import json
+import os
 import re
 
 import tkinter.scrolledtext
@@ -142,34 +144,39 @@ class Browser(tkinter.Toplevel):
 		self.flag_rss = False
 		self.helptxt = HELPTEXT
 		self.title('Simple RSS')
+		
 		self.fontname = None
+		self.randfont = False
 		self.goodfonts = [
 					'Noto Mono',
 					'Bitstream Vera Sans Mono',
 					'Liberation Mono',
 					'Inconsolata'
 					]
+					
+		self.badfonts = [
+					'Standard Symbols PS',
+					'OpenSymbol',
+					'Noto Color Emoji',	# This one is really bad, causes segfault and hard crash (killed by OS)
+					'FontAwesome',
+					'Droid Sans Fallback',
+					'D050000L'
+					]
+		
+		fontfamilies = [f for f in tkinter.font.families() if f not in self.badfonts]
+		random.shuffle(fontfamilies)
 
 		for fontname in self.goodfonts:
-			if fontname in tkinter.font.families():
+			if fontname in fontfamilies:
 				self.fontname = fontname
 				break
 		
-		if not self.fontname:
-			self.fontname = tkinter.font.families()[0]
-			print(f'WARNING: RANDOM FONT NAMED "{self.fontname.upper()}" IN USE. Select a better font with: ctrl-p')
+		if self.fontname == None:
+			self.fontname = fontfamilies[0]
+			self.randfont = True
 			
 		self.font1 = tkinter.font.Font(family=self.fontname, size=12)
 		self.font2 = tkinter.font.Font(family=self.fontname, size=10)
-		
-		# Not setting font-size separately whether hdpi-screen or not.
-		# Because of possible font-scaling by OS like in Debian Bullseye.
-		# So if using non hdpi monitor you are fine and if using
-		# hdpi-monitor and there is font-scaling by OS you are fine.
-		# Only if using hdpi-monitor and there is no font-scaling by OS
-		# or whatever is responsible of such a thing then you have a problem
-		# with default font size being too small. But you can change it with
-		# font-chooser.
 		
 		if ICONPATH:
 			try:
@@ -275,11 +282,18 @@ class Browser(tkinter.Toplevel):
 		# Try to apply saved configurations:
 		try:
 			f = open(CONFPATH)
+		except FileNotFoundError: pass
 		except OSError as e:
 			print(e.__str__())
+			os.remove(CONFPATH)
+			print('\nConfiguration file removed')
 		else:
 			self.load_config(f)
+			self.randfont = False
 			f.close()
+		
+		if self.randfont == True:
+			print(f'WARNING: RANDOM FONT NAMED "{self.fontname.upper()}" IN USE. Select a better font with: ctrl-p')
 			
 		if self.input:
 			self.make_page(self.input)

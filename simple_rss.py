@@ -3,7 +3,6 @@ import urllib.request
 import html.parser
 import random
 import json
-import os
 import re
 
 import tkinter.scrolledtext
@@ -48,10 +47,15 @@ HELPTEXT = '''
 		
 
 class MyHTMLParser(html.parser.HTMLParser):
-	'''	Parse URL-links in HTML-page. Methods are all wrappers of those in 
-		parent-class, except chk_ignores. These are stored in a list:
-		self.addresses as tuples: (link-name, link-address). These tuples
-		are used (in Browser-class: make_page() and tag_link()) 
+	'''	Parse URL-links in HTML-page. 
+		
+		Methods handle_starttag, handle_endtag and
+		handle_data are overrides of same methods in 
+		parent-class (they are there just examples doing nothing but pass).
+		
+		Every link-name and link-address is saved in a tuple.
+		Tuples are stored in a list: self.addresses. These tuples
+		are used in Browser-class: in make_page() and in tag_link() 
 		to make hyper-links for tkinter Text-widget.
 		
 		Certain types of links are ignored to shorten the list.
@@ -285,8 +289,7 @@ class Browser(tkinter.Toplevel):
 		except FileNotFoundError: pass
 		except OSError as e:
 			print(e.__str__())
-			os.remove(CONFPATH)
-			print('\nConfiguration file removed')
+			print('\nCould not load configuration file %s' % CONFPATH)
 		else:
 			self.load_config(f)
 			self.randfont = False
@@ -305,7 +308,7 @@ class Browser(tkinter.Toplevel):
 			f = open(CONFPATH, 'w', encoding='utf-8')
 		except OSError as e:
 			print(e.__str__())
-			print('Could not save configuration')
+			print('\nCould not save configuration')
 		else:
 			data = dict()	
 			data['font1'] = self.font1.config()
@@ -369,7 +372,7 @@ class Browser(tkinter.Toplevel):
 
 	def lclick(self, event=None):
 		'''	When hyperlink tagname is clicked.
-		''' 
+		'''
 		self.tag_link(event)
 		
 		
@@ -501,7 +504,8 @@ class Browser(tkinter.Toplevel):
 			source = self.history[-1][1]
 			self.flag_back = False
 		
-		self.title(source.upper() + ': %d' % len(self.history))
+		self.title('Loading..')
+		self.update_idletasks()
 		self.wipe()
 		
 		try:
@@ -512,8 +516,10 @@ class Browser(tkinter.Toplevel):
 			self.flag_rss = True
 			self.text1.config(state='disabled')
 			self.text2.config(state='disabled')
+			self.title(source.upper() + ': %d' % len(self.history))
 			return
 			
+		self.title(source.upper() + ': %d' % len(self.history))
 		count = len(self.u._titles)
 		self.flag_rss = True
 		
@@ -759,7 +765,8 @@ class Browser(tkinter.Toplevel):
 		self.flag_back = False
 		self.flag_rss = False
 		self.entry.insert(tkinter.END, link)
-		self.title('Simple RSS: %d' % len(self.history))
+		self.title('Loading..')
+		self.update_idletasks()
 		
 		req = urllib.request.Request(link)
 		req.add_header('User-Agent', self.user_agent)
@@ -771,10 +778,12 @@ class Browser(tkinter.Toplevel):
 			res = urllib.request.urlopen(req, timeout = 8)
 			
 		except OSError as err:
+			self.title('Simple RSS: %d' % len(self.history))
 			s  = 'Something went wrong:\n\n%s' % err.__str__()
 			self.text1.insert(tkinter.END, s)
 			
 		else:
+			self.title('Simple RSS: %d' % len(self.history))
 			res = res.read().decode('utf-8')
 			self.parser.feed(res)	# HTMLParser parses links               
 			s = self.h.handle(res)	# html2text parses page

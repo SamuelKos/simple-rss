@@ -13,7 +13,8 @@ import tkinter
 import html2text
 
 # from current directory
-import font_chooser
+import changefont
+import changecolor
 import rssfeed
 
 # Main-class is Browser and it is last at the bottom
@@ -34,6 +35,7 @@ HELPTEXT = '''
   ctrl-minus:	decrease scrollbar width
 	
   ctrl-p:	Font chooser
+  ctrl-s:	Color chooser
   ctrl-W:	Save configuration
 	
 	
@@ -148,6 +150,8 @@ class Browser(tkinter.Toplevel):
 		self.flag_rss = False
 		self.helptxt = HELPTEXT
 		self.title('Simple RSS')
+		self.fgcolor = '#D3D7CF'
+		self.bgcolor ='#000000'
 		
 		self.fontname = None
 		self.randfont = False
@@ -228,11 +232,12 @@ class Browser(tkinter.Toplevel):
 		self.pane.add(self.fram2)
 
 		self.text1 = tkinter.scrolledtext.ScrolledText(self.fram1,
-			font=self.font1, tabstyle='wordprocessor', background='#000000',
-			foreground='#D3D7CF', insertbackground='#D3D7CF', blockcursor=True)
+			font=self.font1, tabstyle='wordprocessor', background=self.bgcolor,
+			foreground=self.fgcolor, insertbackground=self.fgcolor,
+			blockcursor=True)
 		
 		self.text2 = tkinter.scrolledtext.ScrolledText(self.fram2,
-			font=self.font2, background='#000000', foreground='#D3D7CF')
+			font=self.font2, background=self.bgcolor, foreground=self.fgcolor)
 		
 		self.elementborderwidth = 4
 		self.scrollbar_width = 30
@@ -263,6 +268,7 @@ class Browser(tkinter.Toplevel):
 		self.h.ignore_links = True
 		self.h.ignore_images = True
 		
+		self.bind("<Control-s>",		self.color_choose)
 		self.bind("<Control-p>",		self.font_choose)
 		self.bind("<Control-W>",		self.save_config)
 		self.bind("<Escape>",			lambda e: self.iconify())
@@ -310,7 +316,9 @@ class Browser(tkinter.Toplevel):
 			print(e.__str__())
 			print('\nCould not save configuration')
 		else:
-			data = dict()	
+			data = dict()
+			data['fgcolor'] = self.text1.cget('foreground')
+			data['bgcolor'] = self.text1.cget('background')
 			data['font1'] = self.font1.config()
 			data['font2'] = self.font2.config()
 			data['scrollbar_width'] = self.scrollbar_width
@@ -328,7 +336,9 @@ class Browser(tkinter.Toplevel):
 	def load_config(self, fileobject):
 		string_representation = fileobject.read()
 		data = json.loads(string_representation)
-
+		
+		self.fgcolor = data['fgcolor']
+		self.bgcolor = data['bgcolor']
 		self.font1.config(**data['font1'])
 		self.font2.config(**data['font2'])
 		
@@ -350,6 +360,10 @@ class Browser(tkinter.Toplevel):
 		
 		self.text1.tag_config('indent_tag', lmargin2=self.lmarg2,
 			tabs=self.titletabs)
+		self.text1.config(background=self.bgcolor, foreground=self.fgcolor,
+			insertbackground=self.fgcolor)
+		self.text2.config(background=self.bgcolor, foreground=self.fgcolor,
+			insertbackground=self.fgcolor)
 			
 		
 	def enter(self, tagname, event=None):
@@ -471,11 +485,14 @@ class Browser(tkinter.Toplevel):
 		
 		
 	def font_choose(self, event=None):
-		self.choose = font_chooser.Fontchooser(self.top,
-			[self.font1, self.font2])
+		self.choose = changefont.FontChooser([self.font1, self.font2])
 			
 		return 'break'
 	
+	def color_choose(self, event=None):		
+		self.color = changecolor.ColorChooser([self.text1, self.text2])				
+		return 'break'
+		
 		
 	def raise_popup(self, event, *args):
 		self.popup_whohasfocus = event.widget

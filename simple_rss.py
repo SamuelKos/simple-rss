@@ -1,3 +1,11 @@
+# TODO:
+# in class Browser, in make_page(): ignores
+# in class MyHTMLParser: ignores
+#		there should be test-pages-list known to use ignores and
+#		test-function to test if all items in ignores are still valid.
+#		Even better there should be a separate program for this, which
+#		would update an ignore-file.
+
 # from standard library
 import urllib.request
 import html.parser
@@ -67,7 +75,20 @@ class MyHTMLParser(html.parser.HTMLParser):
 	def __init__(self):        
 		super().__init__()
 		self.flag = False
-		self.ignore = ['#', 'facebook', 'twitter', 'whatsapp', 'mailto:?']
+		self.ignore = [
+						'#',
+						'(',
+						')',
+						';',
+						'facebook',
+						'play.google',
+						'apps.apple',
+						'instagram',
+						'linkedin',
+						'twitter',
+						'whatsapp',
+						'mailto:?'
+					]
 		self.address = ""
 		self.linkname = ""        
 		self.addresses = list()
@@ -805,7 +826,29 @@ class Browser(tkinter.Toplevel):
 			self.parser.feed(res)	# HTMLParser parses links               
 			s = self.h.handle(res)	# html2text parses page
 			
-			self.text1.insert(tkinter.END, s)
+			# Remove nonsense
+			ignores = [####################################################
+				'Facebook',
+				'Twitter',
+				'Sähköposti',		# Email
+				'Kopioi linkki',	# Copy link
+				'Jaa',				# Share
+				'Kommentoi',		# Comment
+				'SiteWide ContentPlaceholder',
+				'Wide ContentPlaceholder',
+				'Main ContentPlaceholder'
+				]
+			
+			tmp = ''
+			
+			for line in s.splitlines():
+				if line.strip() not in ignores:
+					tmp += line + '\n'
+			
+			# Leave max 2 empty lines
+			tmp = re.sub('(\n){4,}', 3*'\n', tmp)
+			
+			self.text1.insert(tkinter.END, tmp)
 			
 			for tag in self.text2.tag_names():
 				if 'hyper' in tag:

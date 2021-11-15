@@ -224,7 +224,7 @@ class Browser(tkinter.Toplevel):
 		self.frambottom = tkinter.Frame(self)		
 		self.frambottom.pack(side=tkinter.TOP, fill=tkinter.BOTH)
 		
-		self.entry = tkinter.Entry(self.framtop, font=self.font2)
+		self.entry = tkinter.Entry(self.framtop, font=self.font2, bg='lightgrey')
 		self.entry.pack(side=tkinter.LEFT, expand=True, fill=tkinter.X)
 		self.entry.focus_set()
 		
@@ -352,6 +352,7 @@ class Browser(tkinter.Toplevel):
 			string_representation = json.dumps(data)
 			f.write(string_representation)
 			f.close()
+			self.title('Configuration saved')
 
 			
 	def load_config(self, fileobject):
@@ -509,6 +510,7 @@ class Browser(tkinter.Toplevel):
 		self.choose = changefont.FontChooser([self.font1, self.font2])
 			
 		return 'break'
+		
 	
 	def color_choose(self, event=None):		
 		self.color = changecolor.ColorChooser([self.text1, self.text2])				
@@ -840,8 +842,9 @@ class Browser(tkinter.Toplevel):
 				]
 			
 			tmp = ''
+			l = s.splitlines()
 			
-			for line in s.splitlines():
+			for line in l:
 				if line.strip() not in ignores:
 					tmp += line + '\n'
 			

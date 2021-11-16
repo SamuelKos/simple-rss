@@ -6,6 +6,8 @@
 #		Even better there should be a separate program for this, which
 #		would update an ignore-file.
 
+# check if manually insert invalid url
+
 # from standard library
 import urllib.request
 import html.parser
@@ -224,7 +226,7 @@ class Browser(tkinter.Toplevel):
 		self.frambottom = tkinter.Frame(self)		
 		self.frambottom.pack(side=tkinter.TOP, fill=tkinter.BOTH)
 		
-		self.entry = tkinter.Entry(self.framtop, font=self.font2, bg='lightgrey')
+		self.entry = tkinter.Entry(self.framtop, font=self.font2)
 		self.entry.pack(side=tkinter.LEFT, expand=True, fill=tkinter.X)
 		self.entry.focus_set()
 		

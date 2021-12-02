@@ -1,5 +1,8 @@
 # TODO:
-# in class Browser, in make_page(): ignores
+
+# self.history should be class
+
+# - in class Browser, in make_page(): ignores
 # in class MyHTMLParser: ignores
 #		there should be test-pages-list known to use ignores and
 #		test-function to test if all items in ignores are still valid.
@@ -559,7 +562,19 @@ class Browser(tkinter.Toplevel):
 			self.text1.config(state='disabled')
 			self.text2.config(state='disabled')
 			self.title(source.upper() + ': %d' % len(self.history))
-			return
+			self.update_idletasks()
+			raise
+			#return
+		except ValueError as err:
+			s  = 'Something went wrong:\n\n%s' % err.__str__()
+			self.text1.insert(tkinter.END, s)
+			self.flag_rss = True
+			self.text1.config(state='disabled')
+			self.text2.config(state='disabled')
+			self.title(source.upper() + ': %d' % len(self.history))
+			self.update_idletasks()
+			raise
+			#return
 			
 		self.title(source.upper() + ': %d' % len(self.history))
 		count = len(self.u._titles)
@@ -885,7 +900,12 @@ class Browser(tkinter.Toplevel):
 				pattern = self.history[-1][2]
 				pos = self.text1.search(pattern, '1.0', tkinter.END)
 				if pos:
+					self.text1.see('%s + 20 lines' % pos)
+					# ensure we see something before and after
+					self.update_idletasks()
 					self.text1.see(pos)
+					
+					
 		
 		self.text1.config(state='disabled')
 		self.text2.config(state='disabled')

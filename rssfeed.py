@@ -76,4 +76,5 @@ class RssFeed:
 		
 		try: self._titles, self._links = self._parser.parse(self._sources[self._source])
 		except OSError: raise
+		except ValueError: raise
 

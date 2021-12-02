@@ -32,8 +32,8 @@ class Parser:
 		
 		if '<item>' in data_xml:
 			ctag = 'item'
-##		elif '<entry>' in data_xml:
-##			ctag = 'entry'
+		elif '<entry>' in data_xml:
+			ctag = 'entry'
 		else:
 			pattern =	\
 '''simple_rss_parser.py:

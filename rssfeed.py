@@ -10,6 +10,7 @@ class RssFeed:
 		self._sources = self._load(self._sourcefile)
 		self._source = list(self._sources.keys())[1]
 		self._titles = None
+		self._title_of_feed = None
 		self._links = None
 		self._parser = simple_rss_parser.Parser()
 
@@ -74,7 +75,6 @@ class RssFeed:
 		else:
 			self._source = sorted(self._sources.keys())[key]
 		
-		try: self._titles, self._links = self._parser.parse(self._sources[self._source])
-		except OSError: raise
-		except ValueError: raise
+		try: self._title_of_feed, self._titles, self._links = self._parser.parse(self._sources[self._source])
+		except (OSError, ValueError): raise
 

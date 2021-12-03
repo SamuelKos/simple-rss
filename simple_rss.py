@@ -2,6 +2,8 @@
 
 # self.history should be class
 
+# ignores shoud be user editable like sources
+
 # - in class Browser, in make_page(): ignores
 # in class MyHTMLParser: ignores
 #		there should be test-pages-list known to use ignores and
@@ -555,7 +557,8 @@ class Browser(tkinter.Toplevel):
 		
 		try:
 			self.u.select_source(source)
-		except OSError as err:
+			 
+		except (OSError, ValueError) as err:
 			s  = 'Something went wrong:\n\n%s' % err.__str__()
 			self.text1.insert(tkinter.END, s)
 			self.flag_rss = True
@@ -564,19 +567,9 @@ class Browser(tkinter.Toplevel):
 			self.title(source.upper() + ': %d' % len(self.history))
 			self.update_idletasks()
 			raise
-			#return
-		except ValueError as err:
-			s  = 'Something went wrong:\n\n%s' % err.__str__()
-			self.text1.insert(tkinter.END, s)
-			self.flag_rss = True
-			self.text1.config(state='disabled')
-			self.text2.config(state='disabled')
-			self.title(source.upper() + ': %d' % len(self.history))
-			self.update_idletasks()
-			raise
-			#return
 			
-		self.title(source.upper() + ': %d' % len(self.history))
+		t = self.u._title_of_feed 
+		self.title( f'{t}: {len(self.history)}' )
 		count = len(self.u._titles)
 		self.flag_rss = True
 		

@@ -40,6 +40,7 @@ import rssfeed
 ICONPATH = r'./icons/rssicon.png'
 CONFPATH = r'./rss.cnf'
 RSSLINKS = r'./sources.txt'
+IGNORES  = r'./ignored_lines.txt'
 HELPTEXT = '''
   left: Previous page
   Esc:	Close help / Close edit-sources / Iconify window
@@ -52,8 +53,10 @@ HELPTEXT = '''
   ctrl-p:	Font chooser
   ctrl-s:	Color chooser
   ctrl-W:	Save configuration
-	
-	
+
+  Alt-i:	Edit ignored lines
+
+
   At bottom-pane, when clicked address with mouse-right: copy link
 	
   When editing sources, leave an empty line after last line and then
@@ -181,6 +184,26 @@ class Browser(tkinter.Toplevel):
 		self.fgcolor = '#D3D7CF'
 		self.bgcolor ='#000000'
 		
+		try:
+			with open( IGNORES, 'r', encoding='utf-8' ) as f:
+				self.ignored_lines = f.read().splitlines()
+				
+		except EnvironmentError as e:
+			print( e.__str__() )
+			print( '\n Could not open file %s' % IGNORES )
+		
+			self.ignored_lines = [
+					'Facebook',
+					'Twitter',
+					'Sähköposti',
+					'Kopioi linkki',
+					'Jaa',
+					'Kommentoi',
+					'SiteWide ContentPlaceholder',
+					'Wide ContentPlaceholder',
+					'Main ContentPlaceholder'
+					]
+			
 		self.fontname = None
 		self.randfont = False
 		self.goodfonts = [
@@ -193,7 +216,7 @@ class Browser(tkinter.Toplevel):
 		self.badfonts = [
 					'Standard Symbols PS',
 					'OpenSymbol',
-					'Noto Color Emoji',	# This one is really bad, causes segfault and hard crash (killed by OS)
+					'Noto Color Emoji'
 					'FontAwesome',
 					'Droid Sans Fallback',
 					'D050000L'
@@ -297,6 +320,7 @@ class Browser(tkinter.Toplevel):
 		self.h.ignore_images = True
 		
 		self.bind("<Control-s>",		self.color_choose)
+		self.bind("<Alt-i>",		self.edit_ignored_lines)
 		self.bind("<Control-p>",		self.font_choose)
 		self.bind("<Control-W>",		self.save_config)
 		self.bind("<Escape>",			lambda e: self.iconify())
@@ -523,6 +547,70 @@ class Browser(tkinter.Toplevel):
 		self.color = changecolor.ColorChooser([self.text1, self.text2])				
 		return 'break'
 		
+		
+########### Edit ignores begin
+
+	def edit_ignored_lines(self, event=None):
+		labeltext = \
+'''If feed contains disruptive lines, like 'Share', 'Comment' etc.
+which consumes display-space and your time scrolling through this spam
+copy those lines here below. You can copy many lines at once
+if there is for example a social media block, just copy whole block and
+paste here, empty lines does not matter. Lines are treated separately
+so copying a block of lines ignores all those lines also separately.'''
+
+		tmptop = tkinter.Toplevel(self.top)
+		tmptop.title('Edit ignored lines')
+		
+		self.ignored_lines.sort()
+		ignores = '\n'.join(self.ignored_lines)
+		
+		tmptop.btnsave = tkinter.Button(tmptop, text='Save', font=self.font2)
+		tmptop.btnsave.pack(padx=10, pady=10)
+		
+		tmptop.labelhelp = tkinter.Label(tmptop, text=labeltext, font=self.font2, justify=tkinter.LEFT)
+		tmptop.labelhelp.pack(padx=10)
+		
+		tmptop.text = tkinter.scrolledtext.ScrolledText(tmptop, font=self.font1, background=self.bgcolor,
+			foreground=self.fgcolor, insertbackground=self.fgcolor, blockcursor=True, wrap=tkinter.NONE)
+		
+		tmptop.text.pack(padx=10, pady=10)
+		
+		tmptop.text.vbar.config( elementborderwidth = self.elementborderwidth )
+		tmptop.text.vbar.config( elementborderwidth = self.elementborderwidth )
+		tmptop.text.vbar.config( width = self.scrollbar_width )
+		tmptop.text.vbar.config( width = self.scrollbar_width )
+		
+		tmptop.text.insert('1.0', ignores)
+		
+		tmptop.btnsave.config(command=lambda args=[tmptop]: self.save_ignored_lines(args))
+		
+		return 'break'
+		
+	
+	def save_ignored_lines(self, args, event=None):
+		parent = args[0]
+		tmp = parent.text.get('1.0', tkinter.END).splitlines()
+		
+		self.ignored_lines = [ line.strip() for line in tmp if len(line.strip()) > 0 ]
+		# remove duplicates
+		s = set(self.ignored_lines)
+		self.ignored_lines = [ line for line in s ]
+		
+		print(self.ignored_lines)
+		
+		ignores = '\n'.join(self.ignored_lines)
+		
+		try:
+			with open( IGNORES, 'w', encoding='utf-8' ) as f:
+				f.write(ignores)
+				
+		except EnvironmentError as e:
+			print(e.__str__())
+			print('\n Could not save file %s' % './ignored_lines.txt')
+		
+			
+########### Edit ignores End
 		
 	def raise_popup(self, event, *args):
 		self.popup_whohasfocus = event.widget
@@ -838,28 +926,20 @@ class Browser(tkinter.Toplevel):
 			self.parser.feed(res)	# HTMLParser parses links               
 			s = self.h.handle(res)	# html2text parses page
 			
-			# Remove nonsense
-			ignores = [####################################################
-				'Facebook',
-				'Twitter',
-				'Sähköposti',		# Email
-				'Kopioi linkki',	# Copy link
-				'Jaa',				# Share
-				'Kommentoi',		# Comment
-				'SiteWide ContentPlaceholder',
-				'Wide ContentPlaceholder',
-				'Main ContentPlaceholder'
-				]
-			
+############# Modify page Begin
+
+			# Remove ignored lines from page:
 			tmp = ''
 			l = s.splitlines()
 			
 			for line in l:
-				if line.strip() not in ignores:
+				if line.strip() not in self.ignored_lines:
 					tmp += line + '\n'
 			
 			# Leave max 2 empty lines
 			tmp = re.sub('(\n){4,}', 3*'\n', tmp)
+
+############# Modify page End
 			
 			self.text1.insert(tkinter.END, tmp)
 			
@@ -893,13 +973,14 @@ class Browser(tkinter.Toplevel):
 				pattern = self.history[-1][2]
 				pos = self.text1.search(pattern, '1.0', tkinter.END)
 				if pos:
-					self.text1.see('%s + 20 lines' % pos)
-					# ensure we see something before and after
-					self.update_idletasks()
-					self.text1.see(pos)
+					line = int(pos.split('.')[0])
+					if line > 20:
+						self.text1.see('%s + 20 lines' % pos)
+						# ensure we see something before and after
+						self.update_idletasks()
+						self.text1.see(pos)
 					
 					
-		
 		self.text1.config(state='disabled')
 		self.text2.config(state='disabled')
 

@@ -1,6 +1,6 @@
 # simple-rss
 Simple RSS Reader with GUI. Tested to work with Debian Bullseye.
-* Update: several fixes, might now work with Atom-blogs
+* Update: Added possibility to edit ignored lines.
 
 # Installing
 debian-packages required: python3-tk python3-venv

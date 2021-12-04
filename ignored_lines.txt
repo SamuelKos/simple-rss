@@ -1,0 +1,12 @@
+Main ContentPlaceholder
+* Partage
+Sähköposti
+Kommentoi
+Twitter
+* Partage désactivé Partage désactivé
+* Partage désactivé Envoyer par e-mail
+Kopioi linkki
+Facebook
+Jaa
+SiteWide ContentPlaceholder
+Wide ContentPlaceholder

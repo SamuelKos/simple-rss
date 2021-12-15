@@ -1,12 +1,13 @@
-Main ContentPlaceholder
-* Partage
-Sähköposti
 Kommentoi
+Facebook
+Sähköposti
+* Partage
+* Partage désactivé Envoyer par e-mail
+Wide ContentPlaceholder
+Jaa
 Twitter
 * Partage désactivé Partage désactivé
-* Partage désactivé Envoyer par e-mail
-Kopioi linkki
-Facebook
-Jaa
+* Give this article
 SiteWide ContentPlaceholder
-Wide ContentPlaceholder
+Main ContentPlaceholder
+Kopioi linkki

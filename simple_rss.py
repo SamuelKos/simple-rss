@@ -1,16 +1,6 @@
 # TODO:
 
 # self.history should be class
-
-# ignores shoud be user editable like sources
-
-# - in class Browser, in make_page(): ignores
-# in class MyHTMLParser: ignores
-#		there should be test-pages-list known to use ignores and
-#		test-function to test if all items in ignores are still valid.
-#		Even better there should be a separate program for this, which
-#		would update an ignore-file.
-
 # check if manually insert invalid url
 
 # from standard library
@@ -559,7 +549,7 @@ if there is for example a social media block, just copy whole block and
 paste here, empty lines does not matter. Lines are treated separately
 so copying a block of lines ignores all those lines also separately.'''
 
-		tmptop = tkinter.Toplevel(self.top)
+		tmptop = tkinter.Toplevel()#self.top)
 		tmptop.title('Edit ignored lines')
 		
 		self.ignored_lines.sort()
@@ -597,8 +587,6 @@ so copying a block of lines ignores all those lines also separately.'''
 		s = set(self.ignored_lines)
 		self.ignored_lines = [ line for line in s ]
 		
-		print(self.ignored_lines)
-		
 		ignores = '\n'.join(self.ignored_lines)
 		
 		try:
@@ -609,6 +597,10 @@ so copying a block of lines ignores all those lines also separately.'''
 			print(e.__str__())
 			print('\n Could not save file %s' % './ignored_lines.txt')
 		
+		# quit quits mainloop so good to know that if trying to kill child
+		# windows without killing main app
+		#parent.quit()
+		parent.destroy()
 			
 ########### Edit ignores End
 		

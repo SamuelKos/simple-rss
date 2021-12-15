@@ -13,10 +13,10 @@ class ColorChooser(tkinter.Toplevel):
 		self.colorbg = self.widgetlist[0].cget('background')
 		self.colorfg = self.widgetlist[0].cget('foreground')
 		
-		self.btnfg = tkinter.Button(self, text='Change foreground color', font=('TkDefaultFont', 16), command=lambda args=['fg']: self.chcolor(args))
+		self.btnfg = tkinter.Button(self, text='Text color', font=('TkDefaultFont', 16), command=lambda args=['fg']: self.chcolor(args))
 		self.btnfg.pack(padx=10, pady=10)
 		
-		self.btnbg = tkinter.Button(self, text='Change background color', font=('TkDefaultFont', 16), command=lambda args=['bg']: self.chcolor(args))
+		self.btnbg = tkinter.Button(self, text='Background color', font=('TkDefaultFont', 16), command=lambda args=['bg']: self.chcolor(args))
 		self.btnbg.pack(padx=10, pady=10)
 		
 		

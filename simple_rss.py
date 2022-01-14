@@ -1,6 +1,7 @@
 # TODO:
 
 # self.history should be class
+# from flags to states if possible
 # check if manually insert invalid url
 
 # from standard library
@@ -33,6 +34,8 @@ RSSLINKS = r'./sources.txt'
 IGNORES  = r'./ignored_lines.txt'
 HELPTEXT = '''
   left: Previous page
+  j:	Search title from page
+  n:	Clear search
   Esc:	Close help / Close edit-sources / Iconify window
 	
   ctrl-period:	increase titlepage tabstop
@@ -52,12 +55,11 @@ HELPTEXT = '''
   When editing sources, leave an empty line after last line and then
   write name for the feed to be in the dropdown-menu and then add
   URL-address of the RSS-feed to next line.
-
 		'''
 		
 
 class MyHTMLParser(html.parser.HTMLParser):
-	'''	Parse URL-links in HTML-page. 
+	'''	Parse URL-links in HTML-page.
 		
 		Methods handle_starttag, handle_endtag and
 		handle_data are overrides of same methods in 
@@ -169,10 +171,12 @@ class Browser(tkinter.Toplevel):
 		self.input = url
 		self.flag_back = False
 		self.flag_rss = False
+		self.state = None
 		self.helptxt = HELPTEXT
 		self.title('Simple RSS')
 		self.fgcolor = '#D3D7CF'
 		self.bgcolor ='#000000'
+		self.pos = '1.0'
 		
 		try:
 			with open( IGNORES, 'r', encoding='utf-8' ) as f:
@@ -297,11 +301,13 @@ class Browser(tkinter.Toplevel):
 		# Because texts are disabled, we must make next lambda to
 		# be able copy text from them with ctrl-c:
 		self.text1.bind("<1>",		lambda event: self.text1.focus_set())
+		self.text1.bind("<j>", self.search_next)
+		self.text1.bind("<n>", self.clear_search)
 		self.text2.bind("<Enter>",	self.enter_text2)
 		self.text2.bind("<Leave>",	self.leave_text2)            
 		self.text1.pack(side=tkinter.BOTTOM,  expand=True, fill=tkinter.BOTH)
 		self.text2.pack(side=tkinter.BOTTOM,  expand=True, fill=tkinter.BOTH)
-		
+				
 		# links in text2 are parsed with:
 		self.parser = MyHTMLParser()
 		# page in text1 is parsed with:
@@ -351,6 +357,54 @@ class Browser(tkinter.Toplevel):
 		######## Init End ###############################################
 
 	
+	def clear_search(self, event=None):
+		''' Remove highlighting of search. Shortcut: n
+		'''
+		if self.state == 'page':
+			self.text1.tag_remove('sel', '1.0', tkinter.END)
+			return 'break'
+		else:
+			return
+	
+	
+	def search_next(self, event=None):
+		''' Search and highlight next occurence of title. Shortcut: j
+		'''
+		if self.state != 'page':
+			return
+			
+		if self.history[-1][2]:
+			if self.pos != '1.0':
+				pos = "%s + 1c" % self.pos
+			else:
+				pos = self.pos
+			
+			wordlen = len(self.history[-1][2])
+			pattern = self.history[-1][2]
+			
+			pos = self.text1.search(pattern, pos, tkinter.END)
+			
+			# Try again from the beginning this time:
+			if not pos:
+				pos = self.text1.search(pattern, '1.0', tkinter.END)
+
+				if not pos:
+					self.pos = '1.0'
+					return "break"
+			
+			if pos:
+				self.text1.tag_remove('sel', '1.0', tkinter.END)
+				self.pos = pos
+				self.text1.see(pos)
+				lastpos = "%s + %dc" % (pos, wordlen)
+				self.text1.tag_add('sel', pos, lastpos)
+				
+				return "break"
+				
+		else:
+			return "break"
+
+
 	def save_config(self, event=None):
 		try:
 			f = open(CONFPATH, 'w', encoding='utf-8')
@@ -623,6 +677,7 @@ so copying a block of lines ignores all those lines also separately.'''
 		'''	Fetch selected feed with rssfeed (titles and links).
 			Then make title-page with hyperlinks. 
 		'''
+		self.state = 'title'
 		source = self.var.get()
 		
 		if not self.flag_back:
@@ -745,6 +800,7 @@ so copying a block of lines ignores all those lines also separately.'''
 			
 				
 	def editsources(self):
+		self.state = 'edit'
 		self.wipe()
 		self.entry.config(state='disabled')
 		self.optionmenu.destroy()
@@ -768,6 +824,7 @@ so copying a block of lines ignores all those lines also separately.'''
 
 	
 	def help(self):
+		self.state = 'help'
 		self.wipe()
 		self.text1.insert(tkinter.INSERT, self.helptxt)
 		self.text1.config(state='disabled')
@@ -849,6 +906,7 @@ so copying a block of lines ignores all those lines also separately.'''
 			
 			
 	def make_page(self, link=None, title_index=None):
+		self.state = 'page'
 
 		# address is not from hyperlink: 
 		if link == None or self.input:

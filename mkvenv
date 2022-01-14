@@ -26,21 +26,4 @@ python3 -m venv ${newdir} && \
 pip install -U pip && \
 pip install -U setuptools && \
 pip install wheel  && \
-
-echo "" && \
-echo "******************************" && \
-echo "* venv installed succesfully *" && \
-echo "******************************" && \
-echo "" && \
-
-# Second: install normal requirements
-if [[ -e requirements.txt ]]; then
- pip install -r requirements.txt && \
-
- echo "" && \
- echo "**************************************" && \
- echo "* requirements installed succesfully *"
- echo "**************************************" && \
- echo ""
-
-fi
+pip install html2text

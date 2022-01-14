@@ -1,5 +1,6 @@
 # simple-rss
 Simple RSS Reader with GUI. Tested to work with Debian Bullseye.
+* Update: added jump to title -functionality 
 
 # Installing
 debian-packages required: python3-tk python3-venv

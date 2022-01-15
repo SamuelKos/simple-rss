@@ -212,6 +212,7 @@ class Browser(tkinter.Toplevel):
 					'OpenSymbol',
 					'Noto Color Emoji'
 					'FontAwesome',
+					'Dingbats',
 					'Droid Sans Fallback',
 					'D050000L'
 					]

@@ -16,7 +16,7 @@ class ColorChooser(tkinter.Toplevel):
 		self.btnfg = tkinter.Button(self, text='Text color', font=('TkDefaultFont', 16), command=lambda args=['fg']: self.chcolor(args))
 		self.btnfg.pack(padx=10, pady=10)
 		
-		self.btnbg = tkinter.Button(self, text='Background color', font=('TkDefaultFont', 16), command=lambda args=['bg']: self.chcolor(args))
+		self.btnbg = tkinter.Button(self, text='Ref. color', font=('TkDefaultFont', 16), command=lambda args=['bg']: self.chcolor(args))
 		self.btnbg.pack(padx=10, pady=10)
 		
 		

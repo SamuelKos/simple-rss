@@ -304,6 +304,9 @@ class Browser(tkinter.Toplevel):
 		self.text1.bind("<1>",		lambda event: self.text1.focus_set())
 		self.text1.bind("<j>", self.search_next)
 		self.text1.bind("<n>", self.clear_search)
+		# to be able to scroll with arrow-keys in disabled text-widget:
+		self.text1.bind("<Up>",   self.arrow_up_override)
+		self.text1.bind("<Down>", self.arrow_down_override)
 		self.text2.bind("<Enter>",	self.enter_text2)
 		self.text2.bind("<Leave>",	self.leave_text2)            
 		self.text1.pack(side=tkinter.BOTTOM,  expand=True, fill=tkinter.BOTH)
@@ -357,7 +360,25 @@ class Browser(tkinter.Toplevel):
 			self.make_page(self.input)
 		######## Init End ###############################################
 
+
+	def arrow_up_override(self, event=None):
 	
+		if self.state in [ 'page', 'title' ]:
+			self.text1.yview_scroll(-1, tkinter.UNITS)
+			return 'break'
+		else:
+			return
+			
+
+	def arrow_down_override(self, event=None):
+
+		if self.state  in [ 'page', 'title' ]:
+			self.text1.yview_scroll(1, tkinter.UNITS)
+			return 'break'
+		else:
+			return
+
+			
 	def clear_search(self, event=None):
 		''' Remove highlighting of search. Shortcut: n
 		'''

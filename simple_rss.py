@@ -1,6 +1,6 @@
 # TODO:
 
-# self.history should be class
+# self.history should be class(if need mutable attrs) or named tuple
 # from flags to states if possible
 # check if manually insert invalid url
 
@@ -251,7 +251,6 @@ class Browser(tkinter.Toplevel):
 		
 		self.entry = tkinter.Entry(self.framtop, font=self.font2)
 		self.entry.pack(side=tkinter.LEFT, expand=True, fill=tkinter.X)
-		self.entry.focus_set()
 		
 		self.btn_open=tkinter.Button(self.framtop, font=self.font2, text='Open', command=self.make_titlepage)
 		self.btn_open.pack(side=tkinter.LEFT)
@@ -307,6 +306,7 @@ class Browser(tkinter.Toplevel):
 		# to be able to scroll with arrow-keys in disabled text-widget:
 		self.text1.bind("<Up>",   self.arrow_up_override)
 		self.text1.bind("<Down>", self.arrow_down_override)
+		self.text1.bind("<space>", self.space_override)
 		self.text2.bind("<Enter>",	self.enter_text2)
 		self.text2.bind("<Leave>",	self.leave_text2)            
 		self.text1.pack(side=tkinter.BOTTOM,  expand=True, fill=tkinter.BOTH)
@@ -355,12 +355,23 @@ class Browser(tkinter.Toplevel):
 		
 		if self.randfont == True:
 			print(f'WARNING: RANDOM FONT NAMED "{self.fontname.upper()}" IN USE. Select a better font with: ctrl-p')
+		
+		self.text1.focus_set()
 			
 		if self.input:
 			self.make_page(self.input)
 		######## Init End ###############################################
 
 
+	def space_override(self, event=None):
+
+		if self.state  in [ 'page', 'title' ]:
+			self.text1.yview_scroll(21, tkinter.UNITS)
+			return 'break'
+		else:
+			return
+
+			
 	def arrow_up_override(self, event=None):
 	
 		if self.state in [ 'page', 'title' ]:
@@ -763,6 +774,7 @@ so copying a block of lines ignores all those lines also separately.'''
 		# not sure if this is necessary:
 		self.text1.tag_lower('indent_tag')
 		
+		self.text1.focus_set()
 		self.text1.config(state='disabled')
 		self.text2.config(state='disabled')
 		
@@ -1053,6 +1065,7 @@ so copying a block of lines ignores all those lines also separately.'''
 						self.text1.see(pos)
 					
 					
+		self.text1.focus_set()
 		self.text1.config(state='disabled')
 		self.text2.config(state='disabled')
 

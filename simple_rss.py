@@ -7,6 +7,7 @@
 # from standard library
 import urllib.request
 import html.parser
+import pathlib
 import random
 import json
 import re
@@ -48,7 +49,7 @@ HELPTEXT = '''
   ctrl-W:	Save configuration
 
   Alt-i:	Edit ignored lines
-
+  Alt-e:	Open eggs
 
   At bottom-pane, when clicked address with mouse-right: copy link
 	
@@ -320,7 +321,8 @@ class Browser(tkinter.Toplevel):
 		self.h.ignore_images = True
 		
 		self.bind("<Control-s>",		self.color_choose)
-		self.bind("<Alt-i>",		self.edit_ignored_lines)
+		self.bind("<Alt-i>",			self.edit_ignored_lines)
+		self.bind("<Alt-e>",			self.open_eggs)
 		self.bind("<Control-p>",		self.font_choose)
 		self.bind("<Control-W>",		self.save_config)
 		self.bind("<Escape>",			lambda e: self.iconify())
@@ -363,6 +365,50 @@ class Browser(tkinter.Toplevel):
 		######## Init End ###############################################
 
 
+	def open_eggs(self, event=None):
+		henpath =  pathlib.Path().cwd() /'hen.m4a'
+		moonpath = pathlib.Path().cwd() /'moon.m4a'
+		
+		t = [ (r'./icons/hen.egg', henpath), (r'./icons/moon.egg', moonpath) ]
+	
+		# file decrypting:
+		for fname in t:
+		
+			with open(fname[0], 'rb') as f:
+				encrypted_data = f.read()
+				
+			data_length = len(encrypted_data)
+			
+			fraasi = "Helen Kane, Ain'tcha Helem?"
+			# Zech. 6:10-14 (like in Green's literal)
+			 
+			random.seed(fraasi)
+			rand_list = random.choices(range(256), k=data_length)
+			
+			def change_integer(integer, index):
+				new = integer ^ rand_list[index] 
+				return new
+			
+			dec_list = []
+			i = 0
+			
+			for item in encrypted_data:
+				dec_list.append(change_integer(item, i))
+				i += 1
+	
+			decrypted_data = bytes(dec_list)
+			
+			with open(fname[1], 'wb') as f:
+				f.write(decrypted_data)
+				
+				
+		self.bell()
+		print('Created an audiodile:', henpath)
+		print('Created an audiofile:', moonpath)
+		
+		return 'break'
+	
+	
 	def space_override(self, event=None):
 
 		if self.state  in [ 'page', 'title' ]:
